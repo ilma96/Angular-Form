@@ -7,6 +7,8 @@ import {
   animate,
   transition,
 } from '@angular/animations';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-claimant-form',
@@ -32,7 +34,7 @@ export class ClaimantFormComponent implements OnInit {
     'Water Damage',
   ];
 
-  constructor(private formBuilder: FormBuilder) {}
+  constructor(private formBuilder: FormBuilder, private dialog: MatDialog) {}
 
   ngOnInit() {
     this.claimantForm = this.formBuilder.group({
@@ -120,6 +122,16 @@ export class ClaimantFormComponent implements OnInit {
 
   removeSubClaimant(index: number) {
     this.claimants.removeAt(index);
+  }
+
+  showConfirmationMessage(index: number) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent);
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.removeSubClaimant(index);
+      }
+    });
   }
 
   private scrollSectionIntoView() {

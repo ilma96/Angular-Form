@@ -228,6 +228,15 @@
           *ngFor="let member of claimants?.controls; let i = index"
           class="container mt-3" formGroupName="{{i}}"
         >
+        <div class="text-right">
+          <button
+            type="button"
+            class="btn btn-outline-danger"
+            *ngIf="showRemoveButton"
+            (click)="showConfirmationMessage(i)"
+          > x
+          </button>
+        </div>
           <div class="row">
             <div class="col-sm">
               <div class="form-group">
@@ -436,19 +445,11 @@
               </div>
             </div>
           </div>
-          <div class="text-center">
-          <button
-            type="button"
-            class="btn btn-danger"
-            *ngIf="showRemoveButton"
-            (click)="removeSubClaimant(i)"
-          > Delete
-          </button>
-        </div>
         </div>
         <button
           type="button"
-          class="btn btn-primary"
+          class="btn btn-outline-primary"
+          [disabled]="claimantForm.invalid"
           (click)="addSubClaimant()"
         >
           Add
@@ -458,7 +459,7 @@
     <div class="text-right">
       <button
         type="submit"
-        class="btn btn-success"
+        class="btn btn-outline-success"
         [disabled]="claimantForm.invalid"
       >
         Submit
