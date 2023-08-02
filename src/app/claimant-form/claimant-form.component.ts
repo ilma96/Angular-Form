@@ -57,7 +57,7 @@ export class ClaimantFormComponent implements OnInit {
     // });
     // console.log(claimantsArray);
     this.claimantForm
-      .get('ClaimantInjured' && 'ClaimantProperty')
+      .get('ClaimantInjured' || 'ClaimantProperty')
       ?.valueChanges.subscribe((value: string) => {
         const insuranceControl = this.claimantForm.get('ClaimantInsurance');
         if (value === 'no') {
@@ -100,11 +100,12 @@ export class ClaimantFormComponent implements OnInit {
   }
 
   addSubClaimant() {
+    const groupRepEmail = this.claimantForm?.get('GroupRepresentativeEmail')
     const dependentMembers = this.formBuilder.group({
       ClaimantFirstName: ['', Validators.required],
       ClaimantLastName: ['', Validators.required],
       ClaimantSuffix: [''],
-      GroupRepresentativeEmail: ['', [Validators.required, Validators.email]],
+      GroupRepresentativeEmail: [groupRepEmail?.value],
       ClaimantEmailAddress: ['', Validators.email],
       DateofBirth: ['', Validators.required],
       ClaimantInjured: [null, Validators.required],
@@ -114,6 +115,7 @@ export class ClaimantFormComponent implements OnInit {
     });
     this.claimants.push(dependentMembers);
     this.showRemoveButton = true;
+    console.log(dependentMembers);
   }
 
   removeSubClaimant(index: number) {
@@ -134,11 +136,11 @@ export class ClaimantFormComponent implements OnInit {
 
   onSubmit() {
     if (this.claimantForm.valid) {
-      this.claimants.value.forEach((claimant: any) => {
-        claimant.lossIncurred = this.getSelectedLossIncurred(
-          claimant.lossIncurred
-        );
-      });
+      // this.claimants.value.forEach((claimant: any) => {
+      //   claimant.lossIncurred = this.getSelectedLossIncurred(
+      //     claimant.lossIncurred
+      //   );
+      // });
       // this.subClaimants.value.forEach((claimant: any) => {
       //   claimant.lossIncurred = this.getSelectedLossIncurred(
       //     claimant.lossIncurred
