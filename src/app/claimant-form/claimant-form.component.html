@@ -1,0 +1,472 @@
+<h1>Class Action Claim Portal</h1>
+<div class="container mt-3">
+  <form [formGroup]="claimantForm" (ngSubmit)="onSubmit()">
+    <div class="row">
+      <div class="col-sm">
+        <div class="form-group">
+          <label for="firstName">First Name:</label>
+          <input
+            type="text"
+            id="firstName"
+            class="form-control"
+            formControlName="ClaimantFirstName"
+          />
+          <div
+            *ngIf="
+              claimantForm.get('ClaimantFirstName')?.invalid &&
+              claimantForm.get('ClaimantFirstName')?.touched
+            "
+            class="text-danger"
+          >
+            First Name is required*
+          </div>
+        </div>
+      </div>
+      <div class="col-sm">
+        <div class="form-group">
+          <label for="lastName">Last Name:</label>
+          <input
+            type="text"
+            id="lastName"
+            class="form-control"
+            formControlName="ClaimantLastName"
+          />
+          <div
+            *ngIf="
+              claimantForm.get('ClaimantLastName')?.invalid &&
+              claimantForm.get('ClaimantLastName')?.touched
+            "
+            class="text-danger"
+          >
+            Last Name is required*
+          </div>
+        </div>
+      </div>
+      <div class="col-sm">
+        <div class="form-group">
+          <label for="suffix">Suffix:</label>
+          <input
+            type="text"
+            id="sufix"
+            class="form-control"
+            formControlName="ClaimantSuffix"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <div class="form-group">
+          <label for="groupRepEmail">Primary Email:</label>
+          <input
+            type="email"
+            id="groupRepEmail"
+            class="form-control"
+            formControlName="GroupRepresentativeEmail"
+          />
+          <div
+            *ngIf="
+              claimantForm.get('GroupRepresentativeEmail')?.invalid &&
+              claimantForm.get('GroupRepresentativeEmail')?.touched
+            "
+            class="text-danger"
+          >
+            Please enter a valid email address*
+          </div>
+        </div>
+      </div>
+      <div class="col-sm">
+        <div class="form-group">
+          <label for="email">Secondary Email:</label>
+          <input
+            type="email"
+            id="email"
+            class="form-control"
+            formControlName="ClaimantEmailAddress"
+          />
+          <div
+            *ngIf="
+              claimantForm.get('ClaimantEmailAddress')?.invalid &&
+              claimantForm.get('ClaimantEmailAddress')?.touched
+            "
+            class="text-danger"
+          >
+            Please enter a valid email address*
+          </div>
+        </div>
+      </div>
+      <div class="col-sm">
+        <div class="form-group">
+          <label for="dateOfBirth">DOB:</label>
+          <input
+            type="date"
+            id="dateOfBirth"
+            class="form-control"
+            formControlName="DateofBirth"
+          />
+          <div
+            *ngIf="
+              claimantForm.get('DateofBirth')?.invalid &&
+              claimantForm.get('DateofBirth')?.touched
+            "
+            class="text-danger"
+          >
+            Date of Birth is required and must be at least 18 years old*
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="mb-2">Are you injured?</label>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          id="yesOption"
+          value="yes"
+          formControlName="ClaimantInjured"
+        />
+        <label class="form-check-label" for="yesOption">Yes</label>
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          id="noOption"
+          value="no"
+          formControlName="ClaimantInjured"
+        />
+        <label class="form-check-label" for="noOption">No</label>
+      </div>
+      <div
+        *ngIf="
+          claimantForm.get('ClaimantInjured')?.invalid &&
+          claimantForm.get('ClaimantInjured')?.touched
+        "
+        class="text-danger mt-1"
+      >
+        Please choose either Yes or No.
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="mb-2">Has your property been damaged?</label>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          id="yesOption"
+          value="yes"
+          formControlName="ClaimantProperty"
+        />
+        <label class="form-check-label" for="yesOption">Yes</label>
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          id="noOption"
+          value="no"
+          formControlName="ClaimantProperty"
+        />
+        <label class="form-check-label" for="noOption">No</label>
+      </div>
+      <div
+        *ngIf="
+          claimantForm.get('ClaimantProperty')?.invalid &&
+          claimantForm.get('ClaimantProperty')?.touched
+        "
+        class="text-danger mt-1"
+      >
+        Please choose either Yes or No.
+      </div>
+    </div>
+    <div
+      #firstConditionSection
+      *ngIf="
+        claimantForm.get('ClaimantInjured')?.value === 'yes' ||
+        claimantForm.get('ClaimantProperty')?.value === 'yes'
+      "
+      [@fadeInOut]
+    >
+      <div class="form-group">
+        <label class="mb-2">Do you an insurance to cover for the loss?</label>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="radio"
+            id="yesOption"
+            value="yes"
+            formControlName="ClaimantInsurance"
+          />
+          <label class="form-check-label" for="yesOption">Yes</label>
+        </div>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="radio"
+            id="noOption"
+            value="no"
+            formControlName="ClaimantInsurance"
+          />
+          <label class="form-check-label" for="noOption">No</label>
+        </div>
+        <div
+          *ngIf="
+            claimantForm.get('ClaimantInsurance')?.invalid &&
+            claimantForm.get('ClaimantInsurance')?.touched
+          "
+          class="text-danger mt-1"
+        >
+          Please choose either Yes or No.
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <h4>Dependent Members:</h4>
+      <div formArrayName="claimants">
+        <div
+          *ngFor="let member of claimants?.controls; let i = index"
+          class="member-group"
+        >
+          <div class="row">
+            <div class="col-sm">
+              <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <input
+                  type="text"
+                  id="firstName"
+                  class="form-control"
+                  formControlName="ClaimantFirstName"
+                />
+                <div
+                  *ngIf="
+                    member.get('ClaimantFirstName')?.invalid &&
+                    member.get('ClaimantFirstName')?.touched
+                  "
+                  class="text-danger"
+                >
+                  First Name is required*
+                </div>
+              </div>
+            </div>
+            <div class="col-sm">
+              <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <input
+                  type="text"
+                  id="lastName"
+                  class="form-control"
+                  formControlName="ClaimantLastName"
+                />
+                <div
+                  *ngIf="
+                    member.get('ClaimantLastName')?.invalid &&
+                    member.get('ClaimantLastName')?.touched
+                  "
+                  class="text-danger"
+                >
+                  Last Name is required*
+                </div>
+              </div>
+            </div>
+            <div class="col-sm">
+              <div class="form-group">
+                <label for="suffix">Suffix:</label>
+                <input
+                  type="text"
+                  id="sufix"
+                  class="form-control"
+                  formControlName="ClaimantSuffix"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm">
+              <div class="form-group">
+                <label for="groupRepEmail">Primary Email:</label>
+                {{ member.value.groupRepEmail }}
+              </div>
+            </div>
+            <div class="col-sm">
+              <div class="form-group">
+                <label for="email">Secondary Email:</label>
+                <input
+                  type="email"
+                  id="email"
+                  class="form-control"
+                  formControlName="ClaimantEmailAddress"
+                />
+                <div
+                  *ngIf="
+                    member.get('ClaimantEmailAddress')?.invalid &&
+                    member.get('ClaimantEmailAddress')?.touched
+                  "
+                  class="text-danger"
+                >
+                  Please enter a valid email address*
+                </div>
+              </div>
+            </div>
+            <div class="col-sm">
+              <div class="form-group">
+                <label for="dateOfBirth">DOB:</label>
+                <input
+                  type="date"
+                  id="dateOfBirth"
+                  class="form-control"
+                  formControlName="DateofBirth"
+                />
+                <div
+                  *ngIf="
+                    member.get('DateofBirth')?.invalid &&
+                    member.get('DateofBirth')?.touched
+                  "
+                  class="text-danger"
+                >
+                  Date of Birth is required
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="mb-2">Are you injured?</label>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                id="yesOption"
+                value="yes"
+                formControlName="ClaimantInjured"
+              />
+              <label class="form-check-label" for="yesOption">Yes</label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                id="noOption"
+                value="no"
+                formControlName="ClaimantInjured"
+              />
+              <label class="form-check-label" for="noOption">No</label>
+            </div>
+            <div
+              *ngIf="
+                member.get('ClaimantInjured')?.invalid &&
+                member.get('ClaimantInjured')?.touched
+              "
+              class="text-danger mt-1"
+            >
+              Please choose either Yes or No.
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="mb-2">Has your property been damaged?</label>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                id="yesOption"
+                value="yes"
+                formControlName="ClaimantProperty"
+              />
+              <label class="form-check-label" for="yesOption">Yes</label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                id="noOption"
+                value="no"
+                formControlName="ClaimantProperty"
+              />
+              <label class="form-check-label" for="noOption">No</label>
+            </div>
+            <div
+              *ngIf="
+                member.get('ClaimantProperty')?.invalid &&
+                member.get('ClaimantProperty')?.touched
+              "
+              class="text-danger mt-1"
+            >
+              Please choose either Yes or No.
+            </div>
+          </div>
+          <div
+            #firstConditionSection
+            *ngIf="
+              member.get('ClaimantInjured')?.value === 'yes' ||
+              member.get('ClaimantProperty')?.value === 'yes'
+            "
+            [@fadeInOut]
+          >
+            <div class="form-group">
+              <label class="mb-2"
+                >Do you an insurance to cover for the loss?</label
+              >
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  id="yesOption"
+                  value="yes"
+                  formControlName="ClaimantInsurance"
+                />
+                <label class="form-check-label" for="yesOption">Yes</label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  id="noOption"
+                  value="no"
+                  formControlName="ClaimantInsurance"
+                />
+                <label class="form-check-label" for="noOption">No</label>
+              </div>
+              <div
+                *ngIf="
+                  member.get('ClaimantInsurance')?.invalid &&
+                  member.get('ClaimantInsurance')?.touched
+                "
+                class="text-danger mt-1"
+              >
+                Please choose either Yes or No.
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="remove"
+            *ngIf="showRemoveButton"
+            (click)="removeSubClaimant(i)"
+          >
+            <img
+              src="assets/icons/remove.png"
+              alt="Remove"
+              class="remove-icon"
+            />
+          </button>
+        </div>
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="claimantForm.invalid"
+          (click)="addSubClaimant()"
+        >
+          Add
+        </button>
+      </div>
+    </div>
+    <div class="text-center">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="claimantForm.invalid"
+      >
+        Submit
+      </button>
+    </div>
+  </form>
+</div>
