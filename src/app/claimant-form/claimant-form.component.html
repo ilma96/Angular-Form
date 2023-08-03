@@ -18,7 +18,7 @@
             "
             class="text-danger"
           >
-            First Name is required*
+            First Name is required and must be 3-10 characters long*
           </div>
         </div>
       </div>
@@ -38,7 +38,7 @@
             "
             class="text-danger"
           >
-            Last Name is required*
+            Last Name is required and must be 4-15 characters long*
           </div>
         </div>
       </div>
@@ -188,6 +188,28 @@
       "
       [@fadeInOut]
     >
+      <div
+        #secondConditionSection
+        *ngIf="claimantForm.get('ClaimantProperty')?.value === 'yes'"
+        [@fadeInOut]
+      >
+        <div class="form-group">
+          <label>Claimant Loss Incurred:</label>
+          <div formArrayName="ClaimantLossIncurred">
+            <div *ngFor="let option of lossList; let j = index">
+              <label>
+                <input
+                  type="checkbox"
+                  [formControl]="
+                    claimantForm.get('ClaimantLossIncurred')?.controls[j]
+                  "
+                />
+                {{ option }}
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="form-group">
         <label class="mb-2">Do you an insurance to cover for the loss?</label>
         <div class="form-check">
@@ -226,17 +248,19 @@
       <div formArrayName="claimants">
         <div
           *ngFor="let member of claimants?.controls; let i = index"
-          class="container mt-3" formGroupName="{{i}}"
+          class="container mt-3"
+          formGroupName="{{ i }}"
         >
-        <div class="text-right">
-          <button
-            type="button"
-            class="btn btn-outline-danger"
-            *ngIf="showRemoveButton"
-            (click)="showConfirmationMessage(i)"
-          > x
-          </button>
-        </div>
+          <div class="text-right">
+            <button
+              type="button"
+              class="btn btn-outline-danger"
+              *ngIf="showRemoveButton"
+              (click)="showConfirmationMessage(i)"
+            >
+              x
+            </button>
+          </div>
           <div class="row">
             <div class="col-sm">
               <div class="form-group">
@@ -294,7 +318,7 @@
             <div class="col-sm">
               <div class="form-group">
                 <label for="groupRepEmail">Primary Email:</label>
-                {{member.value.GroupRepresentativeEmail}}
+                {{ member.value.GroupRepresentativeEmail }}
               </div>
             </div>
             <div class="col-sm">
@@ -410,6 +434,28 @@
             "
             [@fadeInOut]
           >
+            <!-- <div
+              #secondConditionSection
+              *ngIf="claimantForm.get('ClaimantProperty')?.value === 'yes'"
+              [@fadeInOut]
+            >
+              <div class="form-group">
+                <label>Claimant Loss Incurred:</label>
+                <div formArrayName="ClaimantLossIncurred">
+                  <div *ngFor="let option of lossList; let j = index">
+                    <label>
+                      <input
+                        type="checkbox"
+                        [formControl]="
+                          claimantForm.get('ClaimantLossIncurred')?.controls[j]
+                        "
+                      />
+                      {{ option }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div> -->
             <div class="form-group">
               <label class="mb-2"
                 >Do you an insurance to cover for the loss?</label

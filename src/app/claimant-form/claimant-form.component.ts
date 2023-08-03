@@ -1,5 +1,11 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormArray,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import {
   trigger,
   state,
@@ -17,15 +23,25 @@ import { MatDialog } from '@angular/material/dialog';
   animations: [
     trigger('fadeInOut', [
       state('void', style({ opacity: 0 })),
-      transition(':enter, :leave', [animate(500)]),
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('500ms ease-in-out', style({ opacity: 1 })),
+      ]),
+      transition(':leave', [
+        style({ opacity: 1 }),
+        animate('500ms ease-in-out', style({ opacity: 0 })),
+      ]),
     ]),
   ],
 })
 export class ClaimantFormComponent implements OnInit {
   @ViewChild('firstConditionSection') firstConditionSection!: ElementRef;
-  showCondition: boolean = false;
+  @ViewChild('secondConditionSection') secondConditionSection!: ElementRef;
+  showFirstCondition: boolean = false;
+  showSecondCondition: boolean = false;
   showRemoveButton: boolean = false;
   claimantForm: any = FormGroup;
+  lossIncurredForm: any = FormGroup;
   lossList: string[] = [
     'Home Loss',
     'Tree Damage',
@@ -38,15 +54,29 @@ export class ClaimantFormComponent implements OnInit {
 
   ngOnInit() {
     this.claimantForm = this.formBuilder.group({
-      ClaimantFirstName: ['', Validators.required],
-      ClaimantLastName: ['', Validators.required],
+      ClaimantFirstName: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(10),
+        ],
+      ],
+      ClaimantLastName: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(4),
+          Validators.maxLength(15),
+        ],
+      ],
       ClaimantSuffix: [''],
       GroupRepresentativeEmail: ['', [Validators.required, Validators.email]],
       ClaimantEmailAddress: ['', Validators.email],
       DateofBirth: ['', [Validators.required, this.validateDateOfBirth]],
       ClaimantInjured: [null, Validators.required],
       ClaimantProperty: [null, Validators.required],
-      ClaimantLossIncurred: [this.processLossIncurred([])],
+      ClaimantLossIncurred: this.processLossIncurred(),
       ClaimantInsurance: [null],
       claimants: this.formBuilder.array([]),
     });
@@ -65,7 +95,18 @@ export class ClaimantFormComponent implements OnInit {
         if (value === 'no') {
           insuranceControl.setValue(null);
         } else {
-          this.showCondition = true;
+          this.showFirstCondition = true;
+          setTimeout(() => this.scrollSectionIntoView(), 0);
+        }
+      });
+    this.claimantForm
+      .get('ClaimantProperty')
+      ?.valueChanges.subscribe((value: string) => {
+        const optionControl = this.claimantForm.get('ClaimantLossIncurred');
+        if (value === 'no') {
+          optionControl.setValue([null, null, null, null, null]);
+        } else {
+          this.showSecondCondition = true;
           setTimeout(() => this.scrollSectionIntoView(), 0);
         }
       });
@@ -86,23 +127,26 @@ export class ClaimantFormComponent implements OnInit {
     return age >= 18 ? null : { underAge: true };
   }
 
-  processLossIncurred(selectedOptions: string[]): FormArray {
+  processLossIncurred(): FormArray {
     const formArray = this.formBuilder.array([]);
-    this.lossList.forEach((option) => {
-      const isSelected = selectedOptions
-        ? selectedOptions.includes(option)
-        : false;
-      formArray.push(this.formBuilder.control(isSelected));
-    });
+    this.lossList.forEach(() => formArray.push(this.formBuilder.control(null)));
     return formArray;
   }
+
+  // get lossIncurred() {
+  //   return this.lossIncurredForm.get('ClaimantLossIncurred') as FormArray;
+  // }
+
+  // getLossIncurredControl(index: number): FormControl {
+  //   return this.lossIncurred?.controls[index] as FormControl;
+  // }
 
   get claimants(): FormArray {
     return this.claimantForm.get('claimants') as FormArray;
   }
 
   addSubClaimant() {
-    const groupRepEmail = this.claimantForm?.get('GroupRepresentativeEmail')
+    const groupRepEmail = this.claimantForm?.get('GroupRepresentativeEmail');
     const dependentMembers = this.formBuilder.group({
       ClaimantFirstName: ['', Validators.required],
       ClaimantLastName: ['', Validators.required],
@@ -112,7 +156,7 @@ export class ClaimantFormComponent implements OnInit {
       DateofBirth: ['', Validators.required],
       ClaimantInjured: [null, Validators.required],
       ClaimantProperty: [null, Validators.required],
-      ClaimantLossIncurred: [this.processLossIncurred([])],
+      ClaimantLossIncurred: this.processLossIncurred(),
       ClaimantInsurance: [null],
     });
     this.claimants.push(dependentMembers);
@@ -127,7 +171,7 @@ export class ClaimantFormComponent implements OnInit {
   showConfirmationMessage(index: number) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent);
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result === true) {
         this.removeSubClaimant(index);
       }
@@ -137,6 +181,8 @@ export class ClaimantFormComponent implements OnInit {
   private scrollSectionIntoView() {
     this.firstConditionSection.nativeElement.scrollIntoView({
       behavior: 'smooth',
+      block: 'center',
+      inline: 'nearest',
     });
   }
 
