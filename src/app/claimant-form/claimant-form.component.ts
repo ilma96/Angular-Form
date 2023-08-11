@@ -1,11 +1,12 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import {
+  AbstractControl,
   FormArray,
   FormBuilder,
-  FormControl,
   FormGroup,
   Validators,
 } from '@angular/forms';
+import { ClaimantServiceService } from '../claimant-service.service';
 import {
   trigger,
   state,
@@ -50,7 +51,11 @@ export class ClaimantFormComponent implements OnInit {
     'Water Damage',
   ];
 
-  constructor(private formBuilder: FormBuilder, private dialog: MatDialog) {}
+  constructor(
+    private formBuilder: FormBuilder,
+    private dialog: MatDialog,
+    private claimantService: ClaimantServiceService
+  ) {}
 
   ngOnInit() {
     this.claimantForm = this.formBuilder.group({
@@ -58,36 +63,37 @@ export class ClaimantFormComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(10),
+          Validators.minLength(2),
+          Validators.maxLength(50),
+          Validators.pattern("[a-zA-Z][a-zA-Z .'-]*"),
         ],
       ],
       ClaimantLastName: [
         '',
         [
           Validators.required,
-          Validators.minLength(4),
-          Validators.maxLength(15),
+          Validators.minLength(2),
+          Validators.maxLength(50),
+          Validators.pattern("^[a-zA-Z]+(?:['-][a-zA-Z]+)*(?: [a-zA-Z]+)*$"),
         ],
       ],
-      ClaimantSuffix: [''],
+      ClaimantSuffix: ['', Validators.maxLength(15)],
       GroupRepresentativeEmail: ['', [Validators.required, Validators.email]],
-      ClaimantEmailAddress: ['', Validators.email],
-      DateofBirth: ['', [Validators.required, this.validateDateOfBirth]],
+      ClaimantEmailAddress: [''],
+      DateofBirth: [
+        '',
+        [
+          Validators.required,
+          this.validateDateOfBirth,
+          this.futureDateValidator,
+        ],
+      ],
       ClaimantInjured: [null, Validators.required],
       ClaimantProperty: [null, Validators.required],
       ClaimantLossIncurred: this.processLossIncurred(),
       ClaimantInsurance: [null],
-      claimants: this.formBuilder.array([]),
+      subClaimants: this.formBuilder.array([]),
     });
-    // const claimantsArray = this.claimantForm.get('claimants') as FormArray;
-    // const jsonData = JSON.parse(
-    //   '{"Claimants" : [{"Claimant First Name" : null, "Claimant  Nam" : null, "Claimant Suffix" : null, "Group Representative Email" : null, "Claimant Email Address" : null, "Date of Birth" : null, "Claimant Injured" : null, "Claimant Property" : null, "Claimant Loss Incurred": null, "Claimant Insurance" : null }]}'
-    // );
-    // jsonData.Claimants.forEach((claimant: any) => {
-    //   claimantsArray.push(this.createMainClaimantFormGroup(claimant));
-    // });
-    // console.log(claimantsArray);
     this.claimantForm
       .get('ClaimantInjured' || 'ClaimantProperty')
       ?.valueChanges.subscribe((value: string) => {
@@ -102,9 +108,9 @@ export class ClaimantFormComponent implements OnInit {
     this.claimantForm
       .get('ClaimantProperty')
       ?.valueChanges.subscribe((value: string) => {
-        const optionControl = this.claimantForm.get('ClaimantLossIncurred');
+        let optionControl = this.claimantForm.get('ClaimantLossIncurred');
         if (value === 'no') {
-          optionControl.setValue([null, null, null, null, null]);
+          optionControl = this.getSelectedLossIncurred();
         } else {
           this.showSecondCondition = true;
           setTimeout(() => this.scrollSectionIntoView(), 0);
@@ -127,50 +133,74 @@ export class ClaimantFormComponent implements OnInit {
     return age >= 18 ? null : { underAge: true };
   }
 
+  private futureDateValidator(control: any) {
+    const selectedDate = new Date(control.value);
+    const currentDate = new Date();
+    const minDate = new Date('1900-01-01');
+    if (selectedDate > currentDate) {
+      return { futureDate: true };
+    }
+    if (selectedDate < minDate) {
+      return { pastDate: true };
+    }
+    return null;
+  }
+
   processLossIncurred(): FormArray {
     const formArray = this.formBuilder.array([]);
     this.lossList.forEach(() => formArray.push(this.formBuilder.control(null)));
     return formArray;
   }
 
-  // get lossIncurred() {
-  //   return this.lossIncurredForm.get('ClaimantLossIncurred') as FormArray;
-  // }
+  get subClaimants(): FormArray {
+    return this.claimantForm.get('subClaimants') as FormArray;
+  }
 
-  // getLossIncurredControl(index: number): FormControl {
-  //   return this.lossIncurred?.controls[index] as FormControl;
-  // }
-
-  get claimants(): FormArray {
-    return this.claimantForm.get('claimants') as FormArray;
+  getGroupRepEmail(): string {
+    let mainClaimantEmail = this.claimantForm.value.GroupRepresentativeEmail;
+    return mainClaimantEmail;
   }
 
   addSubClaimant() {
     const groupRepEmail = this.claimantForm?.get('GroupRepresentativeEmail');
     const dependentMembers = this.formBuilder.group({
-      ClaimantFirstName: ['', Validators.required],
-      ClaimantLastName: ['', Validators.required],
+      ClaimantFirstName: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(50),
+          Validators.pattern("[a-zA-Z][a-zA-Z .'-]*"),
+        ],
+      ],
+      ClaimantLastName: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(55),
+          Validators.pattern("^[a-zA-Z]+(?:['-][a-zA-Z]+)*(?: [a-zA-Z]+)*$"),
+        ],
+      ],
       ClaimantSuffix: [''],
       GroupRepresentativeEmail: [groupRepEmail?.value],
       ClaimantEmailAddress: ['', Validators.email],
-      DateofBirth: ['', Validators.required],
+      DateofBirth: ['', [Validators.required, this.futureDateValidator]],
       ClaimantInjured: [null, Validators.required],
       ClaimantProperty: [null, Validators.required],
       ClaimantLossIncurred: this.processLossIncurred(),
       ClaimantInsurance: [null],
     });
-    this.claimants.push(dependentMembers);
+    this.subClaimants.push(dependentMembers);
     this.showRemoveButton = true;
-    console.log(dependentMembers);
   }
 
   removeSubClaimant(index: number) {
-    this.claimants.removeAt(index);
+    this.subClaimants.removeAt(index);
   }
 
   showConfirmationMessage(index: number) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent);
-
     dialogRef.afterClosed().subscribe((result) => {
       if (result === true) {
         this.removeSubClaimant(index);
@@ -186,25 +216,119 @@ export class ClaimantFormComponent implements OnInit {
     });
   }
 
-  getSelectedLossIncurred(lossIncurred: boolean[]): string {
-    return this.lossList
-      .filter((option, index) => lossIncurred[index])
-      .join('; ');
+  getSelectedLossIncurred(): string {
+    let counter: any = 0;
+    let finalLossIncurredOptions = '';
+    this.claimantForm.value.ClaimantLossIncurred.forEach((element: boolean) => {
+      if (element === true) {
+        finalLossIncurredOptions =
+          finalLossIncurredOptions + this.lossList[counter] + ';';
+      }
+      counter++;
+    });
+    if (finalLossIncurredOptions != '') {
+      finalLossIncurredOptions = finalLossIncurredOptions.slice(0, -1);
+    }
+    return finalLossIncurredOptions;
+  }
+
+  getSelectedLossIncurredForSubClaimants(index: number): string {
+    let counter: any = 0;
+    let finalLossIncurredOptions = '';
+    const subClaimant = this.claimantForm.value.subClaimants[index];
+
+    if (subClaimant && Array.isArray(subClaimant.ClaimantLossIncurred)) {
+      subClaimant.ClaimantLossIncurred.forEach((element: boolean) => {
+        if (element === true) {
+          finalLossIncurredOptions =
+            finalLossIncurredOptions + this.lossList[counter] + ';';
+        }
+        counter++;
+      });
+    }
+
+    if (finalLossIncurredOptions != '') {
+      finalLossIncurredOptions = finalLossIncurredOptions.slice(0, -1);
+    }
+
+    return finalLossIncurredOptions;
+  }
+
+  processJSONData() {
+    const mainClaimantData = {
+      'Claimant First Name': this.claimantForm.get('ClaimantFirstName').value,
+      'Claimant Last Name': this.claimantForm.get('ClaimantLastName').value,
+      'Claimant Suffix': this.claimantForm.get('ClaimantSuffix').value,
+      'Group Representative Email': this.claimantForm.get(
+        'GroupRepresentativeEmail'
+      ).value,
+      'Claimant Email Address': this.claimantForm.get(
+        'GroupRepresentativeEmail'
+      ).value,
+      'Date of Birth': this.claimantForm.get('DateofBirth').value,
+      'Claimant Injured': this.claimantForm.get('ClaimantInjured').value,
+      'Claimant Property': this.claimantForm.get('ClaimantProperty').value,
+      'Claimant Loss Incurred': this.getSelectedLossIncurred(),
+      'Claimant Insurance': this.claimantForm.get('ClaimantInsurance').value,
+    };
+    const dependentClaimants = this.claimantForm.get(
+      'subClaimants'
+    ) as FormArray;
+    const dependentClaimantsData = dependentClaimants.controls.map(
+      (dependentClaimant: AbstractControl<any, any>) => {
+        const dependentClaimantGroup = dependentClaimant as FormGroup;
+        return {
+          'Claimant First Name':
+            dependentClaimantGroup.get('ClaimantFirstName')?.value,
+          'Claimant Last Name':
+            dependentClaimantGroup.get('ClaimantLastName')?.value,
+          'Claimant Suffix':
+            dependentClaimantGroup.get('ClaimantSuffix')?.value,
+          'Group Representative Email': dependentClaimantGroup.get(
+            'GroupRepresentativeEmail'
+          )?.value,
+          'Claimant Email Address': dependentClaimantGroup.get(
+            'ClaimantEmailAddress'
+          )?.value,
+          'Date of Birth': dependentClaimantGroup.get('DateofBirth')?.value,
+          'Claimant Injured':
+            dependentClaimantGroup.get('ClaimantInjured')?.value,
+          'Claimant Property':
+            dependentClaimantGroup.get('ClaimantProperty')?.value,
+          'Claimant Loss Incurred': dependentClaimantGroup.get(
+            'ClaimantLossIncurred'
+          )?.value,
+          'Claimant Insurance':
+            dependentClaimantGroup.get('ClaimantInsurance')?.value,
+        };
+      }
+    );
+    for (let index = 0; index < dependentClaimants.length; index++) {
+      const subClaimantLossIncurred =
+        this.getSelectedLossIncurredForSubClaimants(index);
+      dependentClaimantsData[index]['Claimant Loss Incurred'] =
+        subClaimantLossIncurred;
+    }
+    return {
+      claimantrequest: {
+        ...mainClaimantData,
+        'Dependent Members': dependentClaimantsData,
+      },
+    };
   }
 
   onSubmit() {
     if (this.claimantForm.valid) {
-      // this.claimants.value.forEach((claimant: any) => {
-      //   claimant.lossIncurred = this.getSelectedLossIncurred(
-      //     claimant.lossIncurred
-      //   );
-      // });
-      // this.subClaimants.value.forEach((claimant: any) => {
-      //   claimant.lossIncurred = this.getSelectedLossIncurred(
-      //     claimant.lossIncurred
-      //   );
-      // });
-      console.log(this.claimantForm.value);
+      const claimantsData = this.processJSONData();
+      console.log('JSON Format:', JSON.stringify(claimantsData));
+      // this.claimantService.postClaimantsData(claimantsData).subscribe(
+      //   (response) => {
+      //     console.log('Success:', response);
+      //   },
+      //   (error) => {
+      //     console.error('Error:', error);
+      //   }
+      // );
     } else {
       console.log('Invalid Form');
     }

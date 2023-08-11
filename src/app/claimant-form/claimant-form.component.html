@@ -14,11 +14,21 @@
           <div
             *ngIf="
               claimantForm.get('ClaimantFirstName')?.invalid &&
-              claimantForm.get('ClaimantFirstName')?.touched
+              (claimantForm.get('ClaimantFirstName')?.touched ||
+                claimantForm.get('ClaimantFirstName')?.dirty)
             "
             class="text-danger"
           >
-            First Name is required and must be 3-10 characters long*
+            <div
+              *ngIf="claimantForm.get('ClaimantFirstName')?.errors?.['required']"
+            >
+              First Name is required*
+            </div>
+            <div
+              *ngIf="claimantForm.get('ClaimantFirstName')?.errors?.['pattern']"
+            >
+              Invalid First Name*
+            </div>
           </div>
         </div>
       </div>
@@ -34,11 +44,21 @@
           <div
             *ngIf="
               claimantForm.get('ClaimantLastName')?.invalid &&
-              claimantForm.get('ClaimantLastName')?.touched
+              (claimantForm.get('ClaimantLastName')?.touched ||
+                claimantForm.get('ClaimantLastName')?.dirty)
             "
             class="text-danger"
           >
-            Last Name is required and must be 4-15 characters long*
+            <div
+              *ngIf="claimantForm.get('ClaimantLastName')?.errors?.['required']"
+            >
+              Last Name is required*
+            </div>
+            <div
+              *ngIf="claimantForm.get('ClaimantLastName')?.errors?.['pattern']"
+            >
+              Invalid Last Name*
+            </div>
           </div>
         </div>
       </div>
@@ -51,13 +71,23 @@
             class="form-control"
             formControlName="ClaimantSuffix"
           />
+          <div
+            *ngIf="claimantForm.get('ClaimantSuffix')?.touched"
+            class="text-danger"
+          >
+            <div
+              *ngIf="claimantForm.get('ClaimantSuffix')?.errors?.['maxlength']"
+            >
+              Suffix cannot exceed 15 characters*
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <div class="row">
       <div class="col-sm">
         <div class="form-group">
-          <label for="groupRepEmail">Primary Email:</label>
+          <label for="groupRepEmail">Email:</label>
           <input
             type="email"
             id="groupRepEmail"
@@ -68,26 +98,6 @@
             *ngIf="
               claimantForm.get('GroupRepresentativeEmail')?.invalid &&
               claimantForm.get('GroupRepresentativeEmail')?.touched
-            "
-            class="text-danger"
-          >
-            Please enter a valid email address*
-          </div>
-        </div>
-      </div>
-      <div class="col-sm">
-        <div class="form-group">
-          <label for="email">Secondary Email:</label>
-          <input
-            type="email"
-            id="email"
-            class="form-control"
-            formControlName="ClaimantEmailAddress"
-          />
-          <div
-            *ngIf="
-              claimantForm.get('ClaimantEmailAddress')?.invalid &&
-              claimantForm.get('ClaimantEmailAddress')?.touched
             "
             class="text-danger"
           >
@@ -111,7 +121,17 @@
             "
             class="text-danger"
           >
-            Date of Birth is required and must be at least 18 years old*
+            <div *ngIf="claimantForm.get('DateofBirth')?.errors?.['required']">
+              Date of Birth is required and must be at least 18 years old*
+            </div>
+            <div
+              *ngIf="claimantForm.get('DateofBirth')?.hasError('futureDate')"
+            >
+              Invalid date*
+            </div>
+            <div *ngIf="claimantForm.get('DateofBirth')?.hasError('pastDate')">
+              Invalid date*
+            </div>
           </div>
         </div>
       </div>
@@ -245,9 +265,9 @@
     </div>
     <div class="form-group">
       <h4>Dependent Members:</h4>
-      <div formArrayName="claimants">
+      <div formArrayName="subClaimants">
         <div
-          *ngFor="let member of claimants?.controls; let i = index"
+          *ngFor="let member of subClaimants?.controls; let i = index"
           class="container mt-3"
           formGroupName="{{ i }}"
         >
@@ -274,11 +294,21 @@
                 <div
                   *ngIf="
                     member.get('ClaimantFirstName')?.invalid &&
-                    member.get('ClaimantFirstName')?.touched
+                    (member.get('ClaimantFirstName')?.touched ||
+                      member.get('ClaimantFirstName')?.dirty)
                   "
                   class="text-danger"
                 >
-                  First Name is required*
+                  <div
+                    *ngIf="member.get('ClaimantFirstName')?.errors?.['required']"
+                  >
+                    First Name is required*
+                  </div>
+                  <div
+                    *ngIf="member.get('ClaimantFirstName')?.errors?.['pattern']"
+                  >
+                    Invalid First Name*
+                  </div>
                 </div>
               </div>
             </div>
@@ -294,11 +324,21 @@
                 <div
                   *ngIf="
                     member.get('ClaimantLastName')?.invalid &&
-                    member.get('ClaimantLastName')?.touched
+                    (member.get('ClaimantLastName')?.touched ||
+                      member.get('ClaimantLastName')?.dirty)
                   "
                   class="text-danger"
                 >
-                  Last Name is required*
+                  <div
+                    *ngIf="member.get('ClaimantLastName')?.errors?.['required']"
+                  >
+                    Last Name is required*
+                  </div>
+                  <div
+                    *ngIf="member.get('ClaimantLastName')?.errors?.['pattern']"
+                  >
+                    Invalid Last Name*
+                  </div>
                 </div>
               </div>
             </div>
@@ -317,13 +357,7 @@
           <div class="row">
             <div class="col-sm">
               <div class="form-group">
-                <label for="groupRepEmail">Primary Email:</label>
-                {{ member.value.GroupRepresentativeEmail }}
-              </div>
-            </div>
-            <div class="col-sm">
-              <div class="form-group">
-                <label for="email">Secondary Email:</label>
+                <label for="email">Email:</label>
                 <input
                   type="email"
                   id="email"
@@ -357,7 +391,14 @@
                   "
                   class="text-danger"
                 >
-                  Date of Birth is required
+                  <div
+                    *ngIf="member.get('DateofBirth')?.hasError('futureDate')"
+                  >
+                    Invalid date*
+                  </div>
+                  <div *ngIf="member.get('DateofBirth')?.hasError('pastDate')">
+                    Invalid date*
+                  </div>
                 </div>
               </div>
             </div>
@@ -434,9 +475,9 @@
             "
             [@fadeInOut]
           >
-            <!-- <div
+            <div
               #secondConditionSection
-              *ngIf="claimantForm.get('ClaimantProperty')?.value === 'yes'"
+              *ngIf="member.get('ClaimantProperty')?.value === 'yes'"
               [@fadeInOut]
             >
               <div class="form-group">
@@ -444,18 +485,13 @@
                 <div formArrayName="ClaimantLossIncurred">
                   <div *ngFor="let option of lossList; let j = index">
                     <label>
-                      <input
-                        type="checkbox"
-                        [formControl]="
-                          claimantForm.get('ClaimantLossIncurred')?.controls[j]
-                        "
-                      />
+                      <input type="checkbox" [formControlName]="j" />
                       {{ option }}
                     </label>
                   </div>
                 </div>
               </div>
-            </div> -->
+            </div>
             <div class="form-group">
               <label class="mb-2"
                 >Do you an insurance to cover for the loss?</label
