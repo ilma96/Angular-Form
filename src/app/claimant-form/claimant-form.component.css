@@ -26,3 +26,16 @@ h1 {
 .remove-icon {
   size: 1px;
 }
+
+.fixed-top {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+}
+
+.content-below-navbar {
+  padding-top: 70px;
+}

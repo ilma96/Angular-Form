@@ -42,7 +42,7 @@ export class ClaimantFormComponent implements OnInit {
   showSecondCondition: boolean = false;
   showRemoveButton: boolean = false;
   claimantForm: any = FormGroup;
-  lossIncurredForm: any = FormGroup;
+  states: string[] = ['---', 'CA', 'NV', 'NY', 'PA'];
   lossList: string[] = [
     'Home Loss',
     'Tree Damage',
@@ -59,13 +59,14 @@ export class ClaimantFormComponent implements OnInit {
 
   ngOnInit() {
     this.claimantForm = this.formBuilder.group({
+      state: ['', Validators.required],
       ClaimantFirstName: [
         '',
         [
           Validators.required,
-          Validators.minLength(2),
+          Validators.minLength(1),
           Validators.maxLength(50),
-          Validators.pattern("[a-zA-Z][a-zA-Z .'-]*"),
+          Validators.pattern("^[a-zA-Z]+(?:['-][a-zA-Z]+)*(?: [a-zA-Z]+)*$"),
         ],
       ],
       ClaimantLastName: [
@@ -170,7 +171,7 @@ export class ClaimantFormComponent implements OnInit {
           Validators.required,
           Validators.minLength(2),
           Validators.maxLength(50),
-          Validators.pattern("[a-zA-Z][a-zA-Z .'-]*"),
+          Validators.pattern("^[a-zA-Z]+(?:['-][a-zA-Z]+)*(?: [a-zA-Z]+)*$"),
         ],
       ],
       ClaimantLastName: [
@@ -254,7 +255,7 @@ export class ClaimantFormComponent implements OnInit {
     return finalLossIncurredOptions;
   }
 
-  processJSONData() {
+  processJSObject() {
     const mainClaimantData = {
       'Claimant First Name': this.claimantForm.get('ClaimantFirstName').value,
       'Claimant Last Name': this.claimantForm.get('ClaimantLastName').value,
@@ -319,16 +320,12 @@ export class ClaimantFormComponent implements OnInit {
 
   onSubmit() {
     if (this.claimantForm.valid) {
-      const claimantsData = this.processJSONData();
-      console.log('JSON Format:', JSON.stringify(claimantsData));
-      // this.claimantService.postClaimantsData(claimantsData).subscribe(
-      //   (response) => {
-      //     console.log('Success:', response);
-      //   },
-      //   (error) => {
-      //     console.error('Error:', error);
-      //   }
-      // );
+      const claimantsDataObject = this.processJSObject();
+      const claimantsJSONData = JSON.stringify(claimantsDataObject);
+      console.log('JSON Format:', claimantsJSONData);
+      this.claimantService
+        .postClaimantsData(claimantsJSONData)
+        .subscribe({ error: console.error });
     } else {
       console.log('Invalid Form');
     }
