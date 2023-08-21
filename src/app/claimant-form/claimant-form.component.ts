@@ -86,7 +86,7 @@ export class ClaimantFormComponent implements OnInit {
         [
           Validators.required,
           this.validateDateOfBirth,
-          this.futureDateValidator,
+          this.futurePastDateValidator,
         ],
       ],
       ClaimantInjured: [null, Validators.required],
@@ -134,7 +134,7 @@ export class ClaimantFormComponent implements OnInit {
     return age >= 18 ? null : { underAge: true };
   }
 
-  private futureDateValidator(control: any) {
+  private futurePastDateValidator(control: any) {
     const selectedDate = new Date(control.value);
     const currentDate = new Date();
     const minDate = new Date('1900-01-01');
@@ -186,7 +186,7 @@ export class ClaimantFormComponent implements OnInit {
       ClaimantSuffix: [''],
       GroupRepresentativeEmail: [groupRepEmail?.value],
       ClaimantEmailAddress: ['', Validators.email],
-      DateofBirth: ['', [Validators.required, this.futureDateValidator]],
+      DateofBirth: ['', [Validators.required, this.futurePastDateValidator]],
       ClaimantInjured: [null, Validators.required],
       ClaimantProperty: [null, Validators.required],
       ClaimantLossIncurred: this.processLossIncurred(),

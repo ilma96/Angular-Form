@@ -171,7 +171,12 @@
               <div
                 *ngIf="claimantForm.get('DateofBirth')?.errors?.['required']"
               >
-                Date of Birth is required and must be at least 18 years old*
+                Date of Birth is required*
+              </div>
+              <div
+                *ngIf="claimantForm.get('DateofBirth')?.errors?.['underAge']"
+              >
+                You must be at least 18 years old*
               </div>
               <div
                 *ngIf="claimantForm.get('DateofBirth')?.hasError('futureDate')"

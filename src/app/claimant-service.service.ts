@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ClaimantServiceService {
   private apiURL =
-    'http://192.168.1.248/Relativity.REST/api/tlsclassaction-management/v1/tlsclassaction-service';
+    'http://108.28.15.180/Relativity.REST/api/tlsclassaction-management/v1/tlsclassaction-service';
 
   constructor(private http: HttpClient) {}
 
