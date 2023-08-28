@@ -1,7 +1,7 @@
 <div class="fixed-top">
   <nav
     class="navbar navbar-light custom-navbar"
-    style="background-color: #00004d; opacity: 0.9; filter: alpha(opacity=50)"
+    style="background-color: #00004d"
   >
     <div class="container-fluid">
       <a class="navbar-brand" href="">
@@ -51,7 +51,7 @@
       <div class="row">
         <div class="col-sm">
           <div class="form-group">
-            <label for="firstName">First Name:</label>
+            <label for="firstName" class="required-label">First Name:</label>
             <input
               type="text"
               id="firstName"
@@ -81,7 +81,7 @@
         </div>
         <div class="col-sm">
           <div class="form-group">
-            <label for="lastName">Last Name:</label>
+            <label for="lastName" class="required-label">Last Name:</label>
             <input
               type="text"
               id="lastName"
@@ -109,6 +109,8 @@
             </div>
           </div>
         </div>
+      </div>
+      <div class="row">
         <div class="col-sm">
           <div class="form-group">
             <label for="suffix">Suffix:</label>
@@ -127,34 +129,19 @@
               >
                 Suffix cannot exceed 15 characters*
               </div>
+              <div
+                *ngIf="claimantForm.get('ClaimantSuffix')?.errors?.['pattern']"
+              >
+                Invalid Suffix*
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="row">
         <div class="col-sm">
           <div class="form-group">
-            <label for="groupRepEmail">Email:</label>
-            <input
-              type="email"
-              id="groupRepEmail"
-              class="form-control"
-              formControlName="GroupRepresentativeEmail"
-            />
-            <div
-              *ngIf="
-                claimantForm.get('GroupRepresentativeEmail')?.invalid &&
-                claimantForm.get('GroupRepresentativeEmail')?.touched
-              "
-              class="text-danger"
+            <label for="dateOfBirth" class="required-label"
+              >Date of Birth:</label
             >
-              Please enter a valid email address*
-            </div>
-          </div>
-        </div>
-        <div class="col-sm">
-          <div class="form-group">
-            <label for="dateOfBirth">DOB:</label>
             <input
               type="date"
               id="dateOfBirth"
@@ -192,8 +179,31 @@
           </div>
         </div>
       </div>
+
+      <div class="row">
+        <div class="col-sm">
+          <div class="form-group">
+            <label for="groupRepEmail" class="required-label">Email:</label>
+            <input
+              type="email"
+              id="groupRepEmail"
+              class="form-control"
+              formControlName="GroupRepresentativeEmail"
+            />
+            <div
+              *ngIf="
+                claimantForm.get('GroupRepresentativeEmail')?.invalid &&
+                claimantForm.get('GroupRepresentativeEmail')?.touched
+              "
+              class="text-danger"
+            >
+              Please enter a valid email address*
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="form-group">
-        <label class="mb-2">Are you injured?</label>
+        <label class="mb-2" class="required-label">Are you injured?</label>
         <div class="form-check">
           <input
             class="form-check-input"
@@ -225,7 +235,9 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="mb-2">Has your property been damaged?</label>
+        <label class="mb-2" class="required-label"
+          >Has your property been damaged?</label
+        >
         <div class="form-check">
           <input
             class="form-check-input"
@@ -270,7 +282,7 @@
           [@fadeInOut]
         >
           <div class="form-group">
-            <label>Claimant Loss Incurred:</label>
+            <label class="required-label">Claimant Loss Incurred:</label>
             <div formArrayName="ClaimantLossIncurred">
               <div *ngFor="let option of lossList; let j = index">
                 <label>
@@ -287,7 +299,9 @@
           </div>
         </div>
         <div class="form-group">
-          <label class="mb-2">Do you an insurance to cover for the loss?</label>
+          <label class="mb-2"
+            >Do you have an insurance to cover for the loss?</label
+          >
           <div class="form-check">
             <input
               class="form-check-input"
@@ -340,7 +354,9 @@
             <div class="row">
               <div class="col-sm">
                 <div class="form-group">
-                  <label for="firstName">First Name:</label>
+                  <label for="firstName" class="required-label"
+                    >First Name:</label
+                  >
                   <input
                     type="text"
                     id="firstName"
@@ -370,7 +386,9 @@
               </div>
               <div class="col-sm">
                 <div class="form-group">
-                  <label for="lastName">Last Name:</label>
+                  <label for="lastName" class="required-label"
+                    >Last Name:</label
+                  >
                   <input
                     type="text"
                     id="lastName"
@@ -413,7 +431,7 @@
             <div class="row">
               <div class="col-sm">
                 <div class="form-group">
-                  <label for="email">Email:</label>
+                  <label for="email" class="required-label">Email:</label>
                   <input
                     type="email"
                     id="email"
@@ -433,7 +451,9 @@
               </div>
               <div class="col-sm">
                 <div class="form-group">
-                  <label for="dateOfBirth">DOB:</label>
+                  <label for="dateOfBirth" class="required-label"
+                    >Date of Birth:</label
+                  >
                   <input
                     type="date"
                     id="dateOfBirth"
@@ -462,7 +482,9 @@
               </div>
             </div>
             <div class="form-group">
-              <label class="mb-2">Are you injured?</label>
+              <label class="mb-2" class="required-label"
+                >Are you injured?</label
+              >
               <div class="form-check">
                 <input
                   class="form-check-input"
@@ -494,7 +516,9 @@
               </div>
             </div>
             <div class="form-group">
-              <label class="mb-2">Has your property been damaged?</label>
+              <label class="mb-2" class="required-label"
+                >Has your property been damaged?</label
+              >
               <div class="form-check">
                 <input
                   class="form-check-input"
@@ -526,7 +550,7 @@
               </div>
             </div>
             <div
-              #firstConditionSection
+              #firstConditionSubSection
               *ngIf="
                 member.get('ClaimantInjured')?.value === 'yes' ||
                 member.get('ClaimantProperty')?.value === 'yes'
@@ -539,7 +563,7 @@
                 [@fadeInOut]
               >
                 <div class="form-group">
-                  <label>Claimant Loss Incurred:</label>
+                  <label class="required-label">Claimant Loss Incurred:</label>
                   <div formArrayName="ClaimantLossIncurred">
                     <div *ngFor="let option of lossList; let j = index">
                       <label>
@@ -552,7 +576,7 @@
               </div>
               <div class="form-group">
                 <label class="mb-2"
-                  >Do you an insurance to cover for the loss?</label
+                  >Do you have an insurance to cover for the loss?</label
                 >
                 <div class="form-check">
                   <input
@@ -607,12 +631,4 @@
       </div>
     </form>
   </div>
-  <!-- <div
-    *ngIf="
-      claimantForm.get('state').value !== 'CA' &&
-      claimantForm.get('state').value !== ''
-    "
-  >
-    <h2 style="text-align: center; color: red">You do not qualify.</h2>
-  </div> -->
 </div>

@@ -37,9 +37,12 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class ClaimantFormComponent implements OnInit {
   @ViewChild('firstConditionSection') firstConditionSection!: ElementRef;
+  @ViewChild('firstConditionSubSection') firstConditionSubSection!: ElementRef;
   @ViewChild('secondConditionSection') secondConditionSection!: ElementRef;
   showFirstCondition: boolean = false;
+  showFirstSubCondition: boolean = false;
   showSecondCondition: boolean = false;
+  showDeceasedConditions: boolean = false;
   showRemoveButton: boolean = false;
   claimantForm: any = FormGroup;
   states: string[] = ['---', 'CA', 'NV', 'NY', 'PA'];
@@ -78,8 +81,10 @@ export class ClaimantFormComponent implements OnInit {
           Validators.pattern("^[a-zA-Z]+(?:['-][a-zA-Z]+)*(?: [a-zA-Z]+)*$"),
         ],
       ],
-      ClaimantSuffix: ['', Validators.maxLength(15)],
-      GroupRepresentativeEmail: ['', [Validators.required, Validators.email]],
+      ClaimantSuffix: [
+        '',
+        [Validators.maxLength(15), Validators.pattern('w+s+Jr.?|Sr.?|I{1,3}$')], // this needs some fixing
+      ],
       ClaimantEmailAddress: [''],
       DateofBirth: [
         '',
@@ -89,10 +94,17 @@ export class ClaimantFormComponent implements OnInit {
           this.futurePastDateValidator,
         ],
       ],
+      // ClaimantDeceased: ['', Validators.required], // depending on the ans of this question, the 4 fields below are either hidden or shown
+      // ClaimantNextOfKin: [null, Validators.required], // input field
+      // DateOfPassing: ['', [Validators.required, this.deceasedDateValidator]],
+      // RelationshipWithDeceased: [null, Validators.required], //radio-button, single-choice question
+      // ProbateCondition: ['', Validators.required],
+      //Has the estate of the decescendent completed the probate process?
+      GroupRepresentativeEmail: ['', [Validators.required, Validators.email]],
       ClaimantInjured: [null, Validators.required],
       ClaimantProperty: [null, Validators.required],
-      ClaimantLossIncurred: this.processLossIncurred(),
-      ClaimantInsurance: [null],
+      ClaimantLossIncurred: this.processLossIncurred(), // make it required maybe?
+      ClaimantInsurance: [null, Validators.required],
       subClaimants: this.formBuilder.array([]),
     });
     this.claimantForm
@@ -100,12 +112,31 @@ export class ClaimantFormComponent implements OnInit {
       ?.valueChanges.subscribe((value: string) => {
         const insuranceControl = this.claimantForm.get('ClaimantInsurance');
         if (value === 'no') {
-          insuranceControl.setValue(null);
+          insuranceControl.setValue('N/A');
         } else {
           this.showFirstCondition = true;
           setTimeout(() => this.scrollSectionIntoView(), 0);
         }
       });
+
+    this.claimantForm
+      .get('subClaimants')
+      ?.valueChanges.subscribe((subClaimantsArray: any[]) => {
+        for (let i = 0; i < subClaimantsArray.length; i++) {
+          const subClaimantGroup = this.subClaimants.at(i) as FormGroup;
+          const insuranceControl = subClaimantGroup.get('ClaimantInsurance');
+          const injuredValue = subClaimantGroup.get('ClaimantInjured')?.value;
+          const propertyValue = subClaimantGroup.get('ClaimantProperty')?.value;
+
+          if (injuredValue === 'no' || propertyValue === 'no') {
+            insuranceControl?.setValue('N/A', { emitEvent: false });
+          } else {
+            this.showFirstSubCondition = true;
+            setTimeout(() => this.scrollSubSectionIntoView(), 0);
+          }
+        }
+      });
+
     this.claimantForm
       .get('ClaimantProperty')
       ?.valueChanges.subscribe((value: string) => {
@@ -143,6 +174,15 @@ export class ClaimantFormComponent implements OnInit {
     }
     if (selectedDate < minDate) {
       return { pastDate: true };
+    }
+    return null;
+  }
+
+  private deceasedDateValidator(control: any) {
+    const selectedDate = new Date(control.value);
+    const currentDate = new Date();
+    if (selectedDate > currentDate) {
+      return { invalidDate: true };
     }
     return null;
   }
@@ -190,7 +230,7 @@ export class ClaimantFormComponent implements OnInit {
       ClaimantInjured: [null, Validators.required],
       ClaimantProperty: [null, Validators.required],
       ClaimantLossIncurred: this.processLossIncurred(),
-      ClaimantInsurance: [null],
+      ClaimantInsurance: [null, Validators.required],
     });
     this.subClaimants.push(dependentMembers);
     this.showRemoveButton = true;
@@ -215,6 +255,16 @@ export class ClaimantFormComponent implements OnInit {
       block: 'center',
       inline: 'nearest',
     });
+  }
+
+  private scrollSubSectionIntoView() {
+    if (this.firstConditionSubSection) {
+      this.firstConditionSubSection.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest',
+      });
+    }
   }
 
   getSelectedLossIncurred(): string {

@@ -6,18 +6,17 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ClaimantServiceService {
-  private apiURL =
-    'http://108.28.15.180/Relativity.REST/api/tlsclassaction-management/v1/tlsclassaction-service';
-
   constructor(private http: HttpClient) {}
 
   postClaimantsData(claimantsData: any): Observable<any> {
-    const url = `${this.apiURL}/addupdateclaimaint?caseartifactid=1019952`;
+    //const url = `https://securetls.transperfect.com/Relativity.REST/api/tlsclassaction-management/v1/tlsclassaction-service/addupdateclaimaint?caseartifactid=65670504`;
+
+    //const url = 'http://localhost:5001/api?caseartifactid=1019952'
+
+    const url =
+      'https://blooming-shelf-00530-667d2fff78d6.herokuapp.com/api?caseartifactid=65670504';
     const headers = new HttpHeaders({
-      'X-CSRF-Header': '-',
       'Content-Type': 'application/json',
-      Authorization:
-        'Basic cmVsYXRpdml0eS5hZG1pbkByZWxhdGl2aXR5LmNvbTpUZXN0MTIzNCE=',
     });
     return this.http.post(url, claimantsData, { headers });
   }

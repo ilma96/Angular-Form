@@ -39,3 +39,8 @@ h1 {
 .content-below-navbar {
   padding-top: 70px;
 }
+
+.required-label::after {
+  content: " *";
+  color: red;
+}
