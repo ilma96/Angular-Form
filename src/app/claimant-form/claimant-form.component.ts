@@ -37,11 +37,13 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class ClaimantFormComponent implements OnInit {
   @ViewChild('firstConditionSection') firstConditionSection!: ElementRef;
-  @ViewChild('firstConditionSubSection') firstConditionSubSection!: ElementRef;
+  @ViewChild('subSectionCondition') subSectionCondition!: ElementRef;
   @ViewChild('secondConditionSection') secondConditionSection!: ElementRef;
+  @ViewChild('deceasedConditionSection') deceasedConditionSection!: ElementRef;
   showFirstCondition: boolean = false;
-  showFirstSubCondition: boolean = false;
+  showSubConditions: boolean = false;
   showSecondCondition: boolean = false;
+  showDeceasedCondition: boolean=false;
   showDeceasedConditions: boolean = false;
   showRemoveButton: boolean = false;
   claimantForm: any = FormGroup;
@@ -94,11 +96,12 @@ export class ClaimantFormComponent implements OnInit {
           this.futurePastDateValidator,
         ],
       ],
-      // ClaimantDeceased: ['', Validators.required], // depending on the ans of this question, the 4 fields below are either hidden or shown
-      // ClaimantNextOfKin: [null, Validators.required], // input field
-      // DateOfPassing: ['', [Validators.required, this.deceasedDateValidator]],
-      // RelationshipWithDeceased: [null, Validators.required], //radio-button, single-choice question
-      // ProbateCondition: ['', Validators.required],
+      ClaimantDeceased: ['', Validators.required], 
+      ClaimantNextOfKin: ['', Validators.required],
+      DateofPassing: ['', [Validators.required, this.deceasedDateValidator]],
+      RelationshipWithDeceased: [null, Validators.required], //radio-button, single-choice question
+      OtherOption: [null, Validators.pattern("^[a-zA-Z]+(?:['-][a-zA-Z]+)*(?: [a-zA-Z]+)*$")],
+      ProbateCondition: ['', Validators.required],
       //Has the estate of the decescendent completed the probate process?
       GroupRepresentativeEmail: ['', [Validators.required, Validators.email]],
       ClaimantInjured: [null, Validators.required],
@@ -119,6 +122,37 @@ export class ClaimantFormComponent implements OnInit {
         }
       });
 
+      this.claimantForm
+      .get('ClaimantDeceased')
+      ?.valueChanges.subscribe((value: string) => {
+        const nextOfKinControl = this.claimantForm.get('ClaimantNextOfKin');
+        const dateOfPassingControl = this.claimantForm.get('DateOfPassing');
+        const relationshipWithDeceasedControl = this.claimantForm.get('RelationshipWithDeceased');
+        const probateConditionControl = this.claimantForm.get('ProbateCondition');
+        if (value === 'no') {
+          nextOfKinControl?.setValue('N/A');
+          // dateOfPassingControl?.setValue('00-00-0000')
+          relationshipWithDeceasedControl?.setValue('N/A');
+          probateConditionControl?.setValue('N/A');
+        } else {
+          // nextOfKinControl.setValue(' ');
+          this.showDeceasedCondition = true;
+          setTimeout(() => this.scrollDeceasedSectionIntoView(), 0);
+        }
+      });
+
+      this.claimantForm
+      .get('ClaimantProperty')
+      ?.valueChanges.subscribe((value: string) => {
+        let optionControl = this.claimantForm.get('ClaimantLossIncurred');
+        if (value === 'no') {
+          optionControl = this.getSelectedLossIncurred();
+        } else {
+          this.showSecondCondition = true;
+          setTimeout(() => this.scrollSectionIntoView(), 0);
+        }
+      });
+
     this.claimantForm
       .get('subClaimants')
       ?.valueChanges.subscribe((subClaimantsArray: any[]) => {
@@ -131,21 +165,9 @@ export class ClaimantFormComponent implements OnInit {
           if (injuredValue === 'no' || propertyValue === 'no') {
             insuranceControl?.setValue('N/A', { emitEvent: false });
           } else {
-            this.showFirstSubCondition = true;
+            this.showSubConditions = true;
             setTimeout(() => this.scrollSubSectionIntoView(), 0);
           }
-        }
-      });
-
-    this.claimantForm
-      .get('ClaimantProperty')
-      ?.valueChanges.subscribe((value: string) => {
-        let optionControl = this.claimantForm.get('ClaimantLossIncurred');
-        if (value === 'no') {
-          optionControl = this.getSelectedLossIncurred();
-        } else {
-          this.showSecondCondition = true;
-          setTimeout(() => this.scrollSectionIntoView(), 0);
         }
       });
   }
@@ -257,9 +279,17 @@ export class ClaimantFormComponent implements OnInit {
     });
   }
 
+  private scrollDeceasedSectionIntoView() {
+    this.deceasedConditionSection.nativeElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'nearest',
+    });
+  }
+
   private scrollSubSectionIntoView() {
-    if (this.firstConditionSubSection) {
-      this.firstConditionSubSection.nativeElement.scrollIntoView({
+    if (this.subSectionCondition) {
+      this.subSectionCondition.nativeElement.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
         inline: 'nearest',

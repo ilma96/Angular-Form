@@ -179,7 +179,213 @@
           </div>
         </div>
       </div>
-
+      <div class="form-group">
+        <label class="mb-2" class="required-label"
+          >Is the claimant deceased?</label
+        >
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="radio"
+            id="yesOption"
+            value="yes"
+            formControlName="ClaimantDeceased"
+          />
+          <label class="form-check-label" for="yesOption">Yes</label>
+        </div>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="radio"
+            id="noOption"
+            value="no"
+            formControlName="ClaimantDeceased"
+          />
+          <label class="form-check-label" for="noOption">No</label>
+        </div>
+        <div
+          *ngIf="
+            claimantForm.get('ClaimantDeceased')?.invalid &&
+            claimantForm.get('ClaimantDeceased')?.touched
+          "
+          class="text-danger mt-1"
+        >
+          Please choose either Yes or No.
+        </div>
+      </div>
+      <div
+      #deceasedConditionSection
+      *ngIf="
+      claimantForm.get('ClaimantDeceased')?.value === 'yes'
+      "
+      [@fadeInOut]
+    >
+    <div class="row">
+      <div class="col-sm">
+        <div class="form-group">
+          <label for="nextOfKin" class="required-label">Next of Kin:</label>
+          <input
+            type="text"
+            id="nextOfKin"
+            class="form-control"
+            formControlName="ClaimantNextOfKin"
+          />
+          <div
+            *ngIf="
+              claimantForm.get('ClaimantNextOfKin')?.invalid &&
+              (claimantForm.get('ClaimantNextOfKin')?.touched ||
+                claimantForm.get('ClaimantNextOfKin')?.dirty)
+            "
+            class="text-danger"
+          >
+            <div
+              *ngIf="claimantForm.get('ClaimantNextOfKin')?.errors?.['required']"
+            >
+              This Field is required*
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm">
+        <div class="form-group">
+          <label for="dateOfDeath" class="required-label"
+            >Date of Death:</label
+          >
+          <input
+            type="date"
+            id="dateOfDeath"
+            class="form-control"
+            formControlName="DateofPassing"
+          />
+          <div
+            *ngIf="
+              claimantForm.get('DateofPassing')?.invalid &&
+              claimantForm.get('DateofPassing')?.touched
+            "
+            class="text-danger"
+          >
+            <div
+              *ngIf="claimantForm.get('DateofPassing')?.errors?.['required']"
+            >
+              This Field is required*
+            </div>
+            <div
+              *ngIf="claimantForm.get('DateofPassing')?.hasError('invalidDate')"
+            >
+              Invalid date*
+            </div>
+          </div>
+        </div>
+      </div>     
+    </div>
+    <div class="form-group">
+      <label class="mb-2" class="required-label">Relationship with Deceased Claimant:</label>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          id="OptionOne"
+          value="Child"
+          formControlName="RelationshipWithDeceased"
+        />
+        <label class="form-check-label" for="OptionOne">Child</label>
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          id="OptionTwo"
+          value="Spouse"
+          formControlName="RelationshipWithDeceased"
+        />
+        <label class="form-check-label" for="OptionTwo">Spouse</label>
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          id="OptionThree"
+          value="Grandchild"
+          formControlName="RelationshipWithDeceased"
+        />
+        <label class="form-check-label" for="OptionThree">Grandchild</label>
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          id="OptionFour"
+          value="Other"
+          formControlName="RelationshipWithDeceased"
+        />
+        <label class="form-check-label" for="OptionFour">Other:</label>
+        <input
+        type="text"
+        id="nextOfKin"
+        class="form-control"
+        formControlName="OtherOption"
+      />
+      <div
+        *ngIf="
+          claimantForm.get('OtherOption')?.invalid &&
+          (claimantForm.get('OtherOption')?.touched ||
+            claimantForm.get('OtherOption')?.dirty)
+        "
+        class="text-danger"
+      >
+        <div
+          *ngIf="claimantForm.get('OtherOption')?.errors?.['pattern']"
+        >
+          Invalid Input*
+        </div>
+      </div>
+      </div>
+      <div
+        *ngIf="
+          claimantForm.get('RelationshipWithDeceased')?.invalid &&
+          claimantForm.get('RelationshipWithDeceased')?.touched
+        "
+        class="text-danger mt-1"
+      >
+        Please choose an option*
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="mb-2" class="required-label"
+        >Has the estate of the decescendent completed the probate process?</label
+      >
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          id="yesOption"
+          value="yes"
+          formControlName="ProbateCondition"
+        />
+        <label class="form-check-label" for="yesOption"
+        >Yes</label>
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          id="noOption"
+          value="no"
+          formControlName="ProbateCondition"
+        />
+        <label class="form-check-label" for="noOption">No</label>
+      </div>
+      <div
+        *ngIf="
+          claimantForm.get('ProbateCondition')?.invalid &&
+          claimantForm.get('ProbateCondition')?.touched
+        "
+        class="text-danger mt-1"
+      >
+        Please choose either Yes or No.
+      </div>
+    </div>
+  </div>
       <div class="row">
         <div class="col-sm">
           <div class="form-group">
@@ -299,7 +505,7 @@
           </div>
         </div>
         <div class="form-group">
-          <label class="mb-2"
+          <label class="mb-2" class="required-label"
             >Do you have an insurance to cover for the loss?</label
           >
           <div class="form-check">
@@ -550,7 +756,7 @@
               </div>
             </div>
             <div
-              #firstConditionSubSection
+              #subSectionCondition
               *ngIf="
                 member.get('ClaimantInjured')?.value === 'yes' ||
                 member.get('ClaimantProperty')?.value === 'yes'
@@ -575,7 +781,7 @@
                 </div>
               </div>
               <div class="form-group">
-                <label class="mb-2"
+                <label class="mb-2" class="required-label"
                   >Do you have an insurance to cover for the loss?</label
                 >
                 <div class="form-check">
