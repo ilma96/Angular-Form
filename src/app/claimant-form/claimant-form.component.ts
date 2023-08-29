@@ -43,7 +43,7 @@ export class ClaimantFormComponent implements OnInit {
   showFirstCondition: boolean = false;
   showSubConditions: boolean = false;
   showSecondCondition: boolean = false;
-  showDeceasedCondition: boolean=false;
+  showDeceasedCondition: boolean = false;
   showDeceasedConditions: boolean = false;
   showRemoveButton: boolean = false;
   claimantForm: any = FormGroup;
@@ -96,11 +96,14 @@ export class ClaimantFormComponent implements OnInit {
           this.futurePastDateValidator,
         ],
       ],
-      ClaimantDeceased: ['', Validators.required], 
+      ClaimantDeceased: ['', Validators.required],
       ClaimantNextOfKin: ['', Validators.required],
       DateofPassing: ['', [Validators.required, this.deceasedDateValidator]],
       RelationshipWithDeceased: [null, Validators.required], //radio-button, single-choice question
-      OtherOption: [null, Validators.pattern("^[a-zA-Z]+(?:['-][a-zA-Z]+)*(?: [a-zA-Z]+)*$")],
+      OtherOption: [
+        null,
+        Validators.pattern("^[a-zA-Z]+(?:['-][a-zA-Z]+)*(?: [a-zA-Z]+)*$"),
+      ],
       ProbateCondition: ['', Validators.required],
       //Has the estate of the decescendent completed the probate process?
       GroupRepresentativeEmail: ['', [Validators.required, Validators.email]],
@@ -122,26 +125,28 @@ export class ClaimantFormComponent implements OnInit {
         }
       });
 
-      this.claimantForm
+    this.claimantForm
       .get('ClaimantDeceased')
       ?.valueChanges.subscribe((value: string) => {
         const nextOfKinControl = this.claimantForm.get('ClaimantNextOfKin');
-        const dateOfPassingControl = this.claimantForm.get('DateOfPassing');
-        const relationshipWithDeceasedControl = this.claimantForm.get('RelationshipWithDeceased');
-        const probateConditionControl = this.claimantForm.get('ProbateCondition');
+        const dateOfPassingControl = this.claimantForm.get('DateofPassing');
+        const relationshipWithDeceasedControl = this.claimantForm.get(
+          'RelationshipWithDeceased'
+        );
+        const probateConditionControl =
+          this.claimantForm.get('ProbateCondition');
         if (value === 'no') {
           nextOfKinControl?.setValue('N/A');
-          // dateOfPassingControl?.setValue('00-00-0000')
+          dateOfPassingControl?.setValue('');
           relationshipWithDeceasedControl?.setValue('N/A');
           probateConditionControl?.setValue('N/A');
         } else {
-          // nextOfKinControl.setValue(' ');
           this.showDeceasedCondition = true;
           setTimeout(() => this.scrollDeceasedSectionIntoView(), 0);
         }
       });
 
-      this.claimantForm
+    this.claimantForm
       .get('ClaimantProperty')
       ?.valueChanges.subscribe((value: string) => {
         let optionControl = this.claimantForm.get('ClaimantLossIncurred');
@@ -347,11 +352,22 @@ export class ClaimantFormComponent implements OnInit {
         'GroupRepresentativeEmail'
       ).value,
       'Date of Birth': this.claimantForm.get('DateofBirth').value,
+      'Date of Passing': this.claimantForm.get('DateofPassing').value,
+      'Claimant Deceased': this.claimantForm.get('ClaimantDeceased').value,
+      'Claimant Next of Kin': this.claimantForm.get('ClaimantNextOfKin').value,
+      'Relationship With Deceased Claimant': this.claimantForm.get(
+        'RelationshipWithDeceased'
+      ).value,
+      'Probate Process': this.claimantForm.get('ProbateCondition').value,
       'Claimant Injured': this.claimantForm.get('ClaimantInjured').value,
       'Claimant Property': this.claimantForm.get('ClaimantProperty').value,
       'Claimant Loss Incurred': this.getSelectedLossIncurred(),
       'Claimant Insurance': this.claimantForm.get('ClaimantInsurance').value,
     };
+
+    if (mainClaimantData['Date of Passing'] === null) {
+      delete mainClaimantData['Date of Passing'];
+    }
     const dependentClaimants = this.claimantForm.get(
       'subClaimants'
     ) as FormArray;
