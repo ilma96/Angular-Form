@@ -4,6 +4,8 @@ import {
   FormArray,
   FormBuilder,
   FormGroup,
+  ValidationErrors,
+  ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { ClaimantServiceService } from '../claimant-service.service';
@@ -43,7 +45,6 @@ export class ClaimantFormComponent implements OnInit {
   showFirstCondition: boolean = false;
   showSubConditions: boolean = false;
   showSecondCondition: boolean = false;
-  showDeceasedCondition: boolean = false;
   showDeceasedConditions: boolean = false;
   showRemoveButton: boolean = false;
   claimantForm: any = FormGroup;
@@ -71,7 +72,9 @@ export class ClaimantFormComponent implements OnInit {
           Validators.required,
           Validators.minLength(1),
           Validators.maxLength(50),
-          Validators.pattern("^[a-zA-Z]+(?:['-][a-zA-Z]+)*(?: [a-zA-Z]+)*$"),
+          Validators.pattern(
+            "^[a-zA-Z]+(?:['-][a-zA-Z]+)*(?: [a-zA-Z]+| [A-Z].)*$"
+          ),
         ],
       ],
       ClaimantLastName: [
@@ -85,7 +88,12 @@ export class ClaimantFormComponent implements OnInit {
       ],
       ClaimantSuffix: [
         '',
-        [Validators.maxLength(15), Validators.pattern('w+s+Jr.?|Sr.?|I{1,3}$')], // this needs some fixing
+        [
+          Validators.maxLength(15),
+          Validators.pattern(
+            '^(?:Jr.|Sr.|[I]{1,3}|[IV]{1,2}|[VI]{1,2}|VII|VIII|IX|VIII)$'
+          ),
+        ], // this needs some fixing
       ],
       ClaimantEmailAddress: [''],
       DateofBirth: [
@@ -98,14 +106,15 @@ export class ClaimantFormComponent implements OnInit {
       ],
       ClaimantDeceased: ['', Validators.required],
       ClaimantNextOfKin: ['', Validators.required],
-      DateofPassing: ['', [Validators.required, this.deceasedDateValidator]],
-      RelationshipWithDeceased: [null, Validators.required], //radio-button, single-choice question
+      DateofPassing: [''], // add another validation such that dop is greater than dob
+      RelationshipWithDeceased: [null, Validators.required],
       OtherOption: [
         null,
-        Validators.pattern("^[a-zA-Z]+(?:['-][a-zA-Z]+)*(?: [a-zA-Z]+)*$"),
+        Validators.pattern(
+          '^(?:[a-zA-Z]+(?:-[a-zA-Z]+)*|(?:[a-zA-Z]+-)*in-law)$'
+        ),
       ],
       ProbateCondition: ['', Validators.required],
-      //Has the estate of the decescendent completed the probate process?
       GroupRepresentativeEmail: ['', [Validators.required, Validators.email]],
       ClaimantInjured: [null, Validators.required],
       ClaimantProperty: [null, Validators.required],
@@ -137,11 +146,11 @@ export class ClaimantFormComponent implements OnInit {
           this.claimantForm.get('ProbateCondition');
         if (value === 'no') {
           nextOfKinControl?.setValue('N/A');
-          dateOfPassingControl?.setValue('');
+          dateOfPassingControl?.setValue('1000-01-01');
           relationshipWithDeceasedControl?.setValue('N/A');
           probateConditionControl?.setValue('N/A');
         } else {
-          this.showDeceasedCondition = true;
+          this.showDeceasedConditions = true;
           setTimeout(() => this.scrollDeceasedSectionIntoView(), 0);
         }
       });
@@ -175,6 +184,11 @@ export class ClaimantFormComponent implements OnInit {
           }
         }
       });
+    this.claimantForm.setValidators([
+      Validators.required,
+      this.dateOfPassingValidator(),
+    ]);
+    this.claimantForm.updateValueAndValidity();
   }
 
   private validateDateOfBirth(control: any) {
@@ -205,13 +219,26 @@ export class ClaimantFormComponent implements OnInit {
     return null;
   }
 
-  private deceasedDateValidator(control: any) {
-    const selectedDate = new Date(control.value);
-    const currentDate = new Date();
-    if (selectedDate > currentDate) {
-      return { invalidDate: true };
-    }
-    return null;
+  private dateOfPassingValidator() {
+    return (formGroup: FormGroup): ValidationErrors | null => {
+      const dobControl = formGroup.get('DateofBirth')?.value;
+      const dopControl = formGroup.get('DateofPassing')?.value;
+      const selectedDate = new Date(dopControl);
+      const currentDate = new Date();
+      if (!dopControl) {
+        formGroup.get('DateofPassing')?.setErrors({ required: true });
+        return { required: true };
+      } else if (dobControl && dopControl && dopControl < dobControl) {
+        formGroup.get('DateofPassing')?.setErrors({ invalidDOP: true });
+        return { invalidDOP: true };
+      } else if (selectedDate > currentDate) {
+        formGroup.get('DateofPassing')?.setErrors({ invalidDOP: true });
+        return { invalidDOP: true };
+      } else {
+        formGroup.get('DateofPassing')?.setErrors(null);
+        return null;
+      }
+    };
   }
 
   processLossIncurred(): FormArray {
@@ -238,7 +265,9 @@ export class ClaimantFormComponent implements OnInit {
           Validators.required,
           Validators.minLength(2),
           Validators.maxLength(50),
-          Validators.pattern("^[a-zA-Z]+(?:['-][a-zA-Z]+)*(?: [a-zA-Z]+)*$"),
+          Validators.pattern(
+            "^[a-zA-Z]+(?:['-][a-zA-Z]+)*(?: [a-zA-Z]+| [A-Z].)*$"
+          ),
         ],
       ],
       ClaimantLastName: [
@@ -250,7 +279,12 @@ export class ClaimantFormComponent implements OnInit {
           Validators.pattern("^[a-zA-Z]+(?:['-][a-zA-Z]+)*(?: [a-zA-Z]+)*$"),
         ],
       ],
-      ClaimantSuffix: [''],
+      ClaimantSuffix: [
+        '',
+        Validators.pattern(
+          '^(?:Jr.|Sr.|[I]{1,3}|[IV]{1,2}|[VI]{1,2}|VII|VIII|IX|VIII)$'
+        ),
+      ],
       GroupRepresentativeEmail: [groupRepEmail?.value],
       ClaimantEmailAddress: ['', Validators.email],
       DateofBirth: ['', [Validators.required, this.futurePastDateValidator]],
@@ -293,13 +327,11 @@ export class ClaimantFormComponent implements OnInit {
   }
 
   private scrollSubSectionIntoView() {
-    if (this.subSectionCondition) {
-      this.subSectionCondition.nativeElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'nearest',
-      });
-    }
+    this.subSectionCondition.nativeElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'nearest',
+    });
   }
 
   getSelectedLossIncurred(): string {
@@ -365,7 +397,7 @@ export class ClaimantFormComponent implements OnInit {
       'Claimant Insurance': this.claimantForm.get('ClaimantInsurance').value,
     };
 
-    if (mainClaimantData['Date of Passing'] === null) {
+    if (mainClaimantData['Date of Passing'] === '1000-01-01') {
       delete mainClaimantData['Date of Passing'];
     }
     const dependentClaimants = this.claimantForm.get(
