@@ -44,3 +44,22 @@ h1 {
   content: " *";
   color: red;
 }
+
+/* CSS for styling the sidebar */
+.sidebar {
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  background-color: #f7f7f7;
+}
+
+.sidebar a {
+  color: #333;
+  text-decoration: none;
+}
+
+.sidebar a:hover {
+  color: #00004d;
+  font-size: larger;
+  background-color: #ebf830;
+}

@@ -5,7 +5,6 @@ import {
   FormBuilder,
   FormGroup,
   ValidationErrors,
-  ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { ClaimantServiceService } from '../claimant-service.service';
