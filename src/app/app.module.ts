@@ -9,9 +9,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClaimantFormComponent } from './claimant-form/claimant-form.component';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 import { HomepageComponent } from './homepage/homepage.component';
+import { ConfirmationComponent } from './confirmation/confirmation.component';
 
 @NgModule({
-  declarations: [AppComponent, ClaimantFormComponent, ConfirmDialogComponent, HomepageComponent],
+  declarations: [AppComponent, ClaimantFormComponent, ConfirmDialogComponent, HomepageComponent, ConfirmationComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

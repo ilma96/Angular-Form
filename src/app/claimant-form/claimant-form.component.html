@@ -4,15 +4,14 @@
     style="background-color: #00004d"
   >
     <div class="container-fluid">
-      
-        <img
-          src="assets/TLS_SS_white.png"
-          alt=""
-          width="230"
-          height="auto"
-          class="d-inline-block align-text-top"
-        />
-     
+      <img
+        src="assets/TLS_SS_white.png"
+        alt=""
+        width="230"
+        height="auto"
+        class="d-inline-block align-text-top"
+      />
+
       <div class="rounded float-right">
         <img
           src="assets/Shared Image.png"
@@ -647,6 +646,21 @@
                         class="form-control"
                         formControlName="ClaimantSuffix"
                       />
+                      <div
+                        *ngIf="member.get('ClaimantSuffix')?.touched"
+                        class="text-danger"
+                      >
+                        <div
+                          *ngIf="member.get('ClaimantSuffix')?.errors?.['maxlength']"
+                        >
+                          Suffix cannot exceed 15 characters*
+                        </div>
+                        <div
+                          *ngIf="member.get('ClaimantSuffix')?.errors?.['pattern']"
+                        >
+                          Invalid Suffix*
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -776,18 +790,12 @@
                   </div>
                 </div>
                 <div
-                  #subSectionCondition
                   *ngIf="
                     member.get('ClaimantInjured')?.value === 'yes' ||
                     member.get('ClaimantProperty')?.value === 'yes'
                   "
-                  [@fadeInOut]
                 >
-                  <div
-                    #secondConditionSection
-                    *ngIf="member.get('ClaimantProperty')?.value === 'yes'"
-                    [@fadeInOut]
-                  >
+                  <div *ngIf="member.get('ClaimantProperty')?.value === 'yes'">
                     <div class="form-group">
                       <label class="required-label"
                         >Claimant Loss Incurred:</label
@@ -850,6 +858,18 @@
               </button>
             </div>
           </div>
+          <div class="text-right">
+            <button
+              type="submit"
+              class="btn btn-outline-success"
+              [disabled]="claimantForm.invalid"
+            >
+              Submit
+            </button>
+          </div>
+          <div *ngIf="viewMessage">
+            <p>Try again, please...</p>
+          </div>
         </form>
       </div>
       <div class="col-md-4">
@@ -884,15 +904,6 @@
           </ul>
         </div>
       </div>
-    </div>
-    <div class="text-center">
-      <button
-        type="submit"
-        class="btn btn-outline-success"
-        [disabled]="claimantForm.invalid"
-      >
-        Submit
-      </button>
     </div>
   </div>
 </div>

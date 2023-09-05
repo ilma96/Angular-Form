@@ -38,14 +38,16 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class ClaimantFormComponent implements OnInit {
   @ViewChild('firstConditionSection') firstConditionSection!: ElementRef;
-  @ViewChild('subSectionCondition') subSectionCondition!: ElementRef;
+  // @ViewChild('subSectionCondition') subSectionCondition!: ElementRef;
   @ViewChild('secondConditionSection') secondConditionSection!: ElementRef;
   @ViewChild('deceasedConditionSection') deceasedConditionSection!: ElementRef;
   showFirstCondition: boolean = false;
-  showSubConditions: boolean = false;
+  // showSubConditions: boolean = false;
   showSecondCondition: boolean = false;
   showDeceasedConditions: boolean = false;
   showRemoveButton: boolean = false;
+  viewMessage: boolean = false;
+  isOtherOptionChecked = false;
   claimantForm: any = FormGroup;
   states: string[] = ['---', 'CA', 'NV', 'NY', 'PA'];
   lossList: string[] = [
@@ -145,7 +147,7 @@ export class ClaimantFormComponent implements OnInit {
           this.claimantForm.get('ProbateCondition');
         if (value === 'no') {
           nextOfKinControl?.setValue('N/A');
-          dateOfPassingControl?.setValue('1000-01-01');
+          dateOfPassingControl?.setValue('2023-09-05');
           relationshipWithDeceasedControl?.setValue('N/A');
           probateConditionControl?.setValue('N/A');
         } else {
@@ -178,8 +180,6 @@ export class ClaimantFormComponent implements OnInit {
           if (injuredValue === 'no' || propertyValue === 'no') {
             insuranceControl?.setValue('N/A', { emitEvent: false });
           } else {
-            this.showSubConditions = true;
-            setTimeout(() => this.scrollSubSectionIntoView(), 0);
           }
         }
       });
@@ -280,9 +280,12 @@ export class ClaimantFormComponent implements OnInit {
       ],
       ClaimantSuffix: [
         '',
-        Validators.pattern(
-          '^(?:Jr.|Sr.|[I]{1,3}|[IV]{1,2}|[VI]{1,2}|VII|VIII|IX|VIII)$'
-        ),
+        [
+          Validators.maxLength(15),
+          Validators.pattern(
+            '^(?:Jr.|Sr.|[I]{1,3}|[IV]{1,2}|[VI]{1,2}|VII|VIII|IX|VIII)$'
+          ),
+        ],
       ],
       GroupRepresentativeEmail: [groupRepEmail?.value],
       ClaimantEmailAddress: ['', Validators.email],
@@ -325,13 +328,15 @@ export class ClaimantFormComponent implements OnInit {
     });
   }
 
-  private scrollSubSectionIntoView() {
-    this.subSectionCondition.nativeElement.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center',
-      inline: 'nearest',
-    });
-  }
+  // private scrollSubSectionIntoView() {
+  //   if (this.subSectionCondition) {
+  //     this.subSectionCondition.nativeElement.scrollIntoView({
+  //       behavior: 'smooth',
+  //       block: 'center',
+  //       inline: 'nearest',
+  //     });
+  //   }
+  // }
 
   getSelectedLossIncurred(): string {
     let counter: any = 0;
@@ -396,8 +401,12 @@ export class ClaimantFormComponent implements OnInit {
       'Claimant Insurance': this.claimantForm.get('ClaimantInsurance').value,
     };
 
-    if (mainClaimantData['Claimant Deceased'] === 'No') {
+    if (mainClaimantData['Date of Passing'] === '2023-09-05') {
       delete mainClaimantData['Date of Passing'];
+    }
+    if (mainClaimantData['Relationship With Deceased Claimant'] === 'Other') {
+      const otherValue = this.claimantForm.get('OtherOption')?.value;
+      mainClaimantData['Relationship With Deceased Claimant'] === otherValue;
     }
     const dependentClaimants = this.claimantForm.get(
       'subClaimants'
@@ -452,7 +461,12 @@ export class ClaimantFormComponent implements OnInit {
       console.log('JSON Format:', claimantsJSONData);
       this.claimantService
         .postClaimantsData(claimantsJSONData)
-        .subscribe({ error: console.error });
+        .subscribe((error) => {
+          if (this.claimantService.showMessage()) {
+            this.viewMessage = true;
+          }
+          this.claimantService.resetRetryAttempts();
+        });
     } else {
       console.log('Invalid Form');
     }
