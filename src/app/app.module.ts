@@ -8,9 +8,10 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClaimantFormComponent } from './claimant-form/claimant-form.component';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
+import { HomepageComponent } from './homepage/homepage.component';
 
 @NgModule({
-  declarations: [AppComponent, ClaimantFormComponent, ConfirmDialogComponent],
+  declarations: [AppComponent, ClaimantFormComponent, ConfirmDialogComponent, HomepageComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
