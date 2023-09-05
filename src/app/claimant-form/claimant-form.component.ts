@@ -113,7 +113,7 @@ export class ClaimantFormComponent implements OnInit {
           '^(?:[a-zA-Z]+(?:-[a-zA-Z]+)*|(?:[a-zA-Z]+-)*in-law)$'
         ),
       ],
-      ProbateCondition: ['', Validators.required],
+      ProbateCondition: [null, Validators.required],
       GroupRepresentativeEmail: ['', [Validators.required, Validators.email]],
       ClaimantInjured: [null, Validators.required],
       ClaimantProperty: [null, Validators.required],
@@ -396,7 +396,7 @@ export class ClaimantFormComponent implements OnInit {
       'Claimant Insurance': this.claimantForm.get('ClaimantInsurance').value,
     };
 
-    if (mainClaimantData['Date of Passing'] === '1000-01-01') {
+    if (mainClaimantData['Claimant Deceased'] === 'No') {
       delete mainClaimantData['Date of Passing'];
     }
     const dependentClaimants = this.claimantForm.get(
