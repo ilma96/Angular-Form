@@ -569,7 +569,7 @@
                     *ngIf="showRemoveButton"
                     (click)="showConfirmationMessage(i)"
                   >
-                    x
+                    remove 🗑
                   </button>
                 </div>
                 <div class="row">
@@ -866,9 +866,9 @@
             >
               Submit
             </button>
-          </div>
-          <div *ngIf="viewMessage">
-            <p>Try again, please...</p>
+            <div *ngIf="viewMessage">
+              <p>Try again, please...</p>
+            </div>
           </div>
         </form>
       </div>

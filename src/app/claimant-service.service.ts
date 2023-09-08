@@ -1,17 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, retry } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ClaimantServiceService {
-  private retryAttempts = 0;
-  private maxRetryAttempts = 3;
-  private showTryAgainMessage = false;
-
   constructor(private http: HttpClient, private router: Router) {}
 
   postClaimantsData(claimantsData: any): Observable<any> {
@@ -24,31 +19,32 @@ export class ClaimantServiceService {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
     });
-    return this.http.post(url, claimantsData, { headers }).pipe(
-      retry(this.maxRetryAttempts), // Retry up to maxRetryAttempts times
-      catchError((error) => {
-        // Handle errors here
-        if (error.status === 200) {
-          // If the status code is 200, navigate to the confirmation page
-          this.router.navigate(['/confirmation']);
-        } else if (this.retryAttempts < this.maxRetryAttempts) {
-          this.showTryAgainMessage = true;
-          this.retryAttempts++;
-        } else {
-          this.router.navigate(['/']);
-        }
-        const err = new Error('Unexpected Error');
-        return throwError(() => err);
-      })
-    );
-  }
-
-  showMessage(): boolean {
-    return this.showTryAgainMessage;
-  }
-
-  resetRetryAttempts() {
-    this.retryAttempts = 0;
-    this.showTryAgainMessage = false;
+    return this.http.post(url, claimantsData, { headers });
   }
 }
+// .pipe(
+//   retry(this.maxRetryAttempts), // Retry up to maxRetryAttempts times
+//   catchError((error) => {
+//     // Handle errors here
+//     if (error.status === 200) {
+//       // If the status code is 200, navigate to the confirmation page
+//       this.router.navigate(['/confirmation']);
+//     } else if (this.retryAttempts < this.maxRetryAttempts) {
+//       this.showTryAgainMessage = true;
+//       this.retryAttempts++;
+//     } else {
+//       this.router.navigate(['/']);
+//     }
+//     const err = new Error('Unexpected Error');
+//     return throwError(() => err);
+//   })
+// );
+
+// showMessage(): boolean {
+// return this.showTryAgainMessage;
+// }
+
+// resetRetryAttempts() {
+// this.retryAttempts = 0;
+// this.showTryAgainMessage = false;
+// }

@@ -17,6 +17,7 @@ import {
 } from '@angular/animations';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-claimant-form',
@@ -46,6 +47,8 @@ export class ClaimantFormComponent implements OnInit {
   showSecondCondition: boolean = false;
   showDeceasedConditions: boolean = false;
   showRemoveButton: boolean = false;
+  private retryAttempts = 0;
+  private maxRetryAttempts = 3;
   viewMessage: boolean = false;
   isOtherOptionChecked = false;
   claimantForm: any = FormGroup;
@@ -57,12 +60,20 @@ export class ClaimantFormComponent implements OnInit {
     'Smoke Damage',
     'Water Damage',
   ];
+  currentDate: string;
 
   constructor(
     private formBuilder: FormBuilder,
     private dialog: MatDialog,
-    private claimantService: ClaimantServiceService
-  ) {}
+    private claimantService: ClaimantServiceService,
+    private router: Router
+  ) {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const day = today.getDate().toString().padStart(2, '0');
+    this.currentDate = `${year}-${month}-${day}`;
+  }
 
   ngOnInit() {
     this.claimantForm = this.formBuilder.group({
@@ -94,7 +105,7 @@ export class ClaimantFormComponent implements OnInit {
           Validators.pattern(
             '^(?:Jr.|Sr.|[I]{1,3}|[IV]{1,2}|[VI]{1,2}|VII|VIII|IX|VIII)$'
           ),
-        ], // this needs some fixing
+        ],
       ],
       ClaimantEmailAddress: [''],
       DateofBirth: [
@@ -110,7 +121,8 @@ export class ClaimantFormComponent implements OnInit {
       DateofPassing: [''], // add another validation such that dop is greater than dob
       RelationshipWithDeceased: [null, Validators.required],
       OtherOption: [
-        null,
+        { value: null, disabled: true },
+
         Validators.pattern(
           '^(?:[a-zA-Z]+(?:-[a-zA-Z]+)*|(?:[a-zA-Z]+-)*in-law)$'
         ),
@@ -119,7 +131,7 @@ export class ClaimantFormComponent implements OnInit {
       GroupRepresentativeEmail: ['', [Validators.required, Validators.email]],
       ClaimantInjured: [null, Validators.required],
       ClaimantProperty: [null, Validators.required],
-      ClaimantLossIncurred: this.processLossIncurred(), // make it required maybe?
+      ClaimantLossIncurred: this.processLossIncurred(),
       ClaimantInsurance: [null, Validators.required],
       subClaimants: this.formBuilder.array([]),
     });
@@ -147,12 +159,22 @@ export class ClaimantFormComponent implements OnInit {
           this.claimantForm.get('ProbateCondition');
         if (value === 'no') {
           nextOfKinControl?.setValue('N/A');
-          dateOfPassingControl?.setValue('2023-09-05');
+          dateOfPassingControl?.setValue(this.currentDate);
           relationshipWithDeceasedControl?.setValue('N/A');
           probateConditionControl?.setValue('N/A');
         } else {
           this.showDeceasedConditions = true;
           setTimeout(() => this.scrollDeceasedSectionIntoView(), 0);
+        }
+      });
+
+    this.claimantForm
+      .get('RelationshipWithDeceased')
+      .valueChanges.subscribe((value: any) => {
+        if (value === 'Other') {
+          this.claimantForm.get('OtherOption')?.enable();
+        } else {
+          this.claimantForm.get('OtherOption')?.disable();
         }
       });
 
@@ -401,12 +423,12 @@ export class ClaimantFormComponent implements OnInit {
       'Claimant Insurance': this.claimantForm.get('ClaimantInsurance').value,
     };
 
-    if (mainClaimantData['Date of Passing'] === '2023-09-05') {
+    if (mainClaimantData['Claimant Deceased'] === 'no') {
       delete mainClaimantData['Date of Passing'];
     }
     if (mainClaimantData['Relationship With Deceased Claimant'] === 'Other') {
       const otherValue = this.claimantForm.get('OtherOption')?.value;
-      mainClaimantData['Relationship With Deceased Claimant'] === otherValue;
+      mainClaimantData['Relationship With Deceased Claimant'] = otherValue;
     }
     const dependentClaimants = this.claimantForm.get(
       'subClaimants'
@@ -458,14 +480,21 @@ export class ClaimantFormComponent implements OnInit {
     if (this.claimantForm.valid) {
       const claimantsDataObject = this.processJSObject();
       const claimantsJSONData = JSON.stringify(claimantsDataObject);
-      console.log('JSON Format:', claimantsJSONData);
+      // console.log('JSON Format:', claimantsJSONData);
       this.claimantService
         .postClaimantsData(claimantsJSONData)
-        .subscribe((error) => {
-          if (this.claimantService.showMessage()) {
+        .subscribe((res) => {
+          // console.log(res);
+          // console.log(res.Status);
+          if (res.Success === true) {
+            // need to figure out how to capture the status code
+            this.router.navigate(['/confirmation']);
+          } else if (this.retryAttempts < this.maxRetryAttempts) {
             this.viewMessage = true;
+            this.retryAttempts++;
+          } else {
+            this.router.navigate(['/']);
           }
-          this.claimantService.resetRetryAttempts();
         });
     } else {
       console.log('Invalid Form');
