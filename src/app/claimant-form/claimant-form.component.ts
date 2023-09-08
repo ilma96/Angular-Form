@@ -51,6 +51,7 @@ export class ClaimantFormComponent implements OnInit {
   private maxRetryAttempts = 3;
   viewMessage: boolean = false;
   isOtherOptionChecked = false;
+  formSubmitted: boolean = false;
   claimantForm: any = FormGroup;
   states: string[] = ['---', 'CA', 'NV', 'NY', 'PA'];
   lossList: string[] = [
@@ -489,6 +490,7 @@ export class ClaimantFormComponent implements OnInit {
           if (res.Success === true) {
             // need to figure out how to capture the status code
             this.router.navigate(['/confirmation']);
+            this.formSubmitted = true;
           } else if (this.retryAttempts < this.maxRetryAttempts) {
             this.viewMessage = true;
             this.retryAttempts++;

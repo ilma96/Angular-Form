@@ -10,9 +10,16 @@ import { ClaimantFormComponent } from './claimant-form/claimant-form.component';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 import { HomepageComponent } from './homepage/homepage.component';
 import { ConfirmationComponent } from './confirmation/confirmation.component';
+import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 
 @NgModule({
-  declarations: [AppComponent, ClaimantFormComponent, ConfirmDialogComponent, HomepageComponent, ConfirmationComponent],
+  declarations: [
+    AppComponent,
+    ClaimantFormComponent,
+    ConfirmDialogComponent,
+    HomepageComponent,
+    ConfirmationComponent,
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
