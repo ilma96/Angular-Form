@@ -6,17 +6,18 @@ import { ConfirmationComponent } from './confirmation/confirmation.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 
 const routes: Routes = [
-  { path: '', component: HomepageComponent },
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: 'home', component: HomepageComponent },
   {
-    path: 'claimant-form',
+    path: 'home/claimant-form',
     component: ClaimantFormComponent,
   },
-  { path: 'confirmation', component: ConfirmationComponent },
+  { path: 'home/confirmation', component: ConfirmationComponent },
   { path: '**', component: NotFoundComponent },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { useHash: true })],
+  imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

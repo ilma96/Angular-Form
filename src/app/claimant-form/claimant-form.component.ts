@@ -489,13 +489,13 @@ export class ClaimantFormComponent implements OnInit {
           // console.log(res.Status);
           if (res.Success === true) {
             // need to figure out how to capture the status code
-            this.router.navigate(['/confirmation']);
+            this.router.navigate(['home/confirmation']);
             this.formSubmitted = true;
           } else if (this.retryAttempts < this.maxRetryAttempts) {
             this.viewMessage = true;
             this.retryAttempts++;
           } else {
-            this.router.navigate(['/']);
+            this.router.navigate(['/home']);
           }
         });
     } else {
