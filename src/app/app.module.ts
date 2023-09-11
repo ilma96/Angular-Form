@@ -11,6 +11,7 @@ import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.componen
 import { HomepageComponent } from './homepage/homepage.component';
 import { ConfirmationComponent } from './confirmation/confirmation.component';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { LocationStrategy, PathLocationStrategy } from '@angular/common';
     ConfirmDialogComponent,
     HomepageComponent,
     ConfirmationComponent,
+    NotFoundComponent,
   ],
   imports: [
     BrowserModule,

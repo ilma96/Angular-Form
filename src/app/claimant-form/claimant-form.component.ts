@@ -7,7 +7,7 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { ClaimantServiceService } from '../claimant-service.service';
+import { ClaimantServiceService } from '../services/claimant-service.service';
 import {
   trigger,
   state,
