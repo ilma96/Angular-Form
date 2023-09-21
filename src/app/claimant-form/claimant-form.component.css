@@ -20,8 +20,46 @@ h1 {
 
 .btn {
   margin-top: 30px;
+  margin-bottom: 30px;
 }
 
 .remove-icon {
   size: 1px;
+}
+
+.fixed-top {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+}
+
+.content-below-navbar {
+  padding-top: 70px;
+}
+
+.required-label::after {
+  content: " *";
+  color: red;
+}
+
+/* styling the sidebar */
+.sidebar {
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  background-color: #f7f7f7;
+}
+
+.sidebar a {
+  color: #333;
+  text-decoration: none;
+}
+
+.sidebar a:hover {
+  color: #00004d;
+  font-size: larger;
+  background-color: #ebf830;
 }
